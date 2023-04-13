@@ -1,8 +1,13 @@
-import { addCourse } from "../../services/courses/coursesConnection";
 import { decodToken } from "../../services/parseToken";
+import { uploadVimeoVideos } from "../../services/vimeo";
 
 export const addCourses = (req: any,res: any) =>{
- const params = req.headers['video'];
  const id  = decodToken(req.cookies.access_token)
- return addCourse({user_id: id.data,video: params}, res);
+ const data = {
+     user_id: id.data,
+     video: req.files[0].filename,
+     name: req.body.name,
+     description: req.body.description
+ }
+ return uploadVimeoVideos(data, res);
 }
