@@ -9,8 +9,6 @@ const fs = require('fs');
 export function deleteVideoLocally (fileName: string){
   try {
   fs.unlinkSync(fileName);
-
-  console.log("Delete File successfully.");
 } catch (error) {
   console.log(error);
 }

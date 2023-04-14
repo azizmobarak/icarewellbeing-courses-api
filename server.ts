@@ -31,7 +31,4 @@ app.use('/api', appRouter);
 
 
 
-app.listen(PORT, ()=>{
-  createDatabaseConnection();
-  console.log('running', PORT)
-})
+app.listen(PORT, ()=>createDatabaseConnection());

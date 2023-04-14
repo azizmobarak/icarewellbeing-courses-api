@@ -1,5 +1,5 @@
 export const createResponse = (status: number, data: string | any, res: any) => {
-   res.send({
+   res.status(status).send({
        status,
        data,
    })

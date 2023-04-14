@@ -27,7 +27,13 @@ const validationResult = (validation: joi.ValidationResult<any>): ValidationResu
 
 
 export function validateUserData ({email, password, username, role}: userData): ValidationResult {
-    if(validateEmail(email).isValid){
+   if(!role || !password || !email || !username){
+        return {
+             error: 'please make sure all inputs with values',
+             isValid: false,
+        }
+   }else{
+         if(validateEmail(email).isValid){
             if(validatePassword(password).isValid){
                if(validateUserName(username).isValid){
                     if(validateUserRole(role).isValid){
@@ -43,6 +49,7 @@ export function validateUserData ({email, password, username, role}: userData): 
        }
     }
      return validateEmail(email);
+   }
 }
 
 
@@ -75,7 +82,7 @@ const schema = joi.object({
 
 export function validateUserRole(role: number){
 const schema = joi.object({
-      role: joi.number().required(),
+      role: joi.number().max(2).required(),
     });
 
      const validation = schema.validate({role})
