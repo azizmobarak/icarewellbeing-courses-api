@@ -29,7 +29,7 @@ app.use(bodyParser.urlencoded({
 
 app.use(cookieParser());
 app.use(cors({
-  origin: ["http://localhost:3000","http://localhost:3000/*"],
+  origin: ["*"],
   credentials: true,
   methods: "GET,PUT,PATCH,POST,DELETE,UPDATE",
 }))
