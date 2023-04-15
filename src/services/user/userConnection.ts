@@ -18,7 +18,7 @@ export interface User {
 export function verifyUserAuth (token: string, res: any) {
   const userModel = new UserModel();
   const {data} = decodToken(token,res);
-  const id = new ObjectId(data);
+  const id = new ObjectId(data.split(',')[0]);
   userModel.collection.findOne(sanitize({_id: id}))
   .then((doc: any) =>{
       if(!doc){
@@ -35,24 +35,23 @@ export function verifyUserAuth (token: string, res: any) {
         userModel.collection.findOne(sanitize({email: data.email}))
         .then((doc: any)=>{
              if(!doc){
-                return createResponse(403,`Sorry , Email or password is not correct`,res);
+                return createResponse(203,`Sorry , Email or password is not correct`,res);
              }else {
-                 checkPassword(doc.password, data.password, res)
-                 authorizeUser(doc._id, doc,res);
+                 checkPassword(doc, data.password, res)
              }
         }).catch(()=>{
-              return createResponse(403,`oops something happen Sorry, back again later`,res);
+              return createResponse(203,`oops something happen Sorry, back again later`,res);
         })
     }
 
-export function authorizeUser (id: string,data: User, res: any) {
-    const token = signUserAuth(id);
+export function authorizeUser (id: string,role: number,data: User, res: any) {
+    const token = signUserAuth(id,role);
    res.cookie("access_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      maxAge: 1 * 60 * 60 * 1000
     })
    .send({
-       token,
        data: {
            email: data.email,
            username: data.username,
