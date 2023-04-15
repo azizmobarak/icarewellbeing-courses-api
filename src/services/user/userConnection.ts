@@ -47,7 +47,7 @@ export function verifyUserAuth (token: string, res: any) {
 export function authorizeUser (id: string,role: number,data: User, res: any) {
     const token = signUserAuth(id,role);
    res.cookie("access_token", token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       maxAge: 1 * 60 * 60 * 1000
     })
