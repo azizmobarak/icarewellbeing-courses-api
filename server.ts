@@ -10,16 +10,11 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
+app.use(cookieParser());
+
 app.use(bodyParser.json({
   limit: '5000mb'
 }));
-
-app.use(function(_req: any, res: any, next: any) {
-  res.header('Access-Control-Allow-Origin', 'localhost:2222');
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
 
 app.use(bodyParser.urlencoded({
   limit: '5000mb',
@@ -27,12 +22,18 @@ app.use(bodyParser.urlencoded({
   extended: true,
 }));
 
-app.use(cookieParser());
 app.use(cors({
-  origin: ["*"],
+  origin: '*',
   credentials: true,
-  methods: "GET,PUT,PATCH,POST,DELETE,UPDATE",
+  // methods: "GET,PUT,PATCH,POST,DELETE,UPDATE",
 }))
+app.use(function(_req: any, res: any, next: any) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
 
 const routes  = [userRouter, authRouter, coursesRouter];
 const appRouter = routes.reduce((router,route) => router.use(route))

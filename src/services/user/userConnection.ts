@@ -15,7 +15,7 @@ export interface User {
   username: string;
 }
 
-export function verifyUserAuth (token: string, res: any) {
+export function verifyUserAuth (token: string, res: any, next:any) {
   const userModel = new UserModel();
   const {data} = decodToken(token,res);
   const id = new ObjectId(data.split(',')[0]);
@@ -24,6 +24,7 @@ export function verifyUserAuth (token: string, res: any) {
       if(!doc){
        return createResponse(403,`Not Authorized`,res);
       }
+      next();
   })
   .catch(()=>{
               return createResponse(403,`oops something happen Sorry, back again later`,res);
@@ -49,7 +50,6 @@ export function authorizeUser (id: string,role: number,data: User, res: any) {
    res.cookie("access_token", token, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 1 * 60 * 60 * 1000
     })
    .send({
        data: {
