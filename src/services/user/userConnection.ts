@@ -53,6 +53,7 @@ export function authorizeUser (id: string,role: number,data: User, res: any) {
     })
    .send({
        data: {
+           id,
            email: data.email,
            username: data.username,
            role: data.role,

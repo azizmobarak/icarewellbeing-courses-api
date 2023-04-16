@@ -14,6 +14,16 @@ const courseSchema  = new mongoose.Schema({
       min: 2,
       required: true,
   },
+  name: {
+      type: String,
+      required: true,
+      max: 250,
+  },
+  description: {
+      type: String,
+      required: true,
+      max: 250,
+  }
 })
 
 

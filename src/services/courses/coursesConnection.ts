@@ -44,13 +44,15 @@ courses.collection.countDocuments({user_id: sanitize(id)})
 }
 
 
-const getCoursesCollections = (id: string,skip: number, limit: number, res: any,totalPages: number, currentPage: number, nextPage: number) => {
+const getCoursesCollections = (id: string,_skip: number, _limit: number, res: any,totalPages: number, currentPage: number, nextPage: number) => {
     const courses = new CoursesModel();
     let data: any[] = [];
-courses.collection.find(sanitize({user_id: id})).skip(skip).limit(limit).forEach(value=>{
+courses.collection.find(sanitize({user_id: id})).forEach(value=>{
      data.push(value);
  })
-    verifyCoursesData(data,res,totalPages,currentPage,nextPage);
+  setTimeout(() => {
+      verifyCoursesData(data,res,totalPages,currentPage,nextPage);
+  }, 3000);
 }
 
 
