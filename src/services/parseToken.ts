@@ -1,13 +1,13 @@
+import { Response } from "express";
 import { createResponse } from "../utils/resultStatus";
 
 const jwt = require('jsonwebtoken');
 
-export function decodToken (token: string,res: any){
+export function decodToken (token: string,res: Response): any {
 try{
-var decoded = jwt.verify(token, process.env.TOKEN_SECRET);
-console.log(decoded)
+var decoded: string = jwt.verify(token, process.env.TOKEN_SECRET);
 return decoded;
 }catch{
-createResponse(403,'Session expired please login',res)
+ return createResponse(403,'Session expired please login',res)
 }
 }

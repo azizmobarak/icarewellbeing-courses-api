@@ -1,17 +1,11 @@
-import { CoursesModel } from "../../models/courses";
+import { Response } from "express";
+import { Courses, CoursesModel } from "../../models/courses";
 import { ErrorCodeStatus, responseErrorHandler } from "../../utils/ErrorHandler";
 import { Pagination, getPaginationByPageNumber } from "../../utils/calculatePagination";
 import { createResponse } from "../../utils/resultStatus";
 const sanitize = require("mongo-sanitize");
 
-export interface Course {
-    video: string;
-    user_id: string;
-    name: string;
-    description: string;
-}
-
-export function addCourse(data: Course, res: any){
+export function addCourse(data: Courses, res: Response){
  try{
  const courses = new CoursesModel(sanitize(data));
  courses.save();
@@ -24,7 +18,7 @@ export function addCourse(data: Course, res: any){
 }
 
 
-export async function getCourses (res: any, id: string, page?: number){
+export async function getCourses (res: Response, id: string, page?: number){
  try{
 const courses = new CoursesModel();
 let pagination: Pagination = {} as Pagination;
@@ -44,7 +38,7 @@ courses.collection.countDocuments({user_id: sanitize(id)})
 }
 
 
-const getCoursesCollections = (id: string,_skip: number, _limit: number, res: any,totalPages: number, currentPage: number, nextPage: number) => {
+const getCoursesCollections = (id: string,_skip: number, _limit: number, res: Response,totalPages: number, currentPage: number, nextPage: number) => {
     const courses = new CoursesModel();
     let data: any[] = [];
 courses.collection.find(sanitize({user_id: id})).forEach(value=>{
