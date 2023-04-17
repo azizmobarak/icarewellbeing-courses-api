@@ -1,7 +1,15 @@
 import mongoose from 'mongoose'
 
 
-const courseSchema  = new mongoose.Schema({
+export interface Courses {
+    video: string;
+    user_id: string;
+    name: string;
+    description: string;
+}
+
+
+const courseSchema  = new mongoose.Schema<Courses>({
   video: {
       type: String,
       max: 1000,
@@ -14,7 +22,17 @@ const courseSchema  = new mongoose.Schema({
       min: 2,
       required: true,
   },
+  name: {
+      type: String,
+      required: true,
+      max: 250,
+  },
+  description: {
+      type: String,
+      required: true,
+      max: 250,
+  }
 })
 
 
-export const CoursesModel = mongoose.model('course', courseSchema);
+export const CoursesModel = mongoose.model<Courses>('course', courseSchema);

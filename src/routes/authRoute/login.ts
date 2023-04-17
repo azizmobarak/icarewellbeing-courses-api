@@ -1,5 +1,4 @@
 import { login } from "../../controllers/auth/login";
-
 import { Router } from "express";
 import { validateLogin } from "../../middlwares/authMiddlwares/authValidation";
 

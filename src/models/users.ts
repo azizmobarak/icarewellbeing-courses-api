@@ -1,7 +1,13 @@
 import mongoose from 'mongoose'
 
+export interface Users {
+    email: string;
+    username: string;
+    password: string;
+    role: string;
+}
 
-const userSchema  = new mongoose.Schema({
+const userSchema  = new mongoose.Schema<Users>({
   email: {
       type: String,
       max: 200,
@@ -26,4 +32,4 @@ const userSchema  = new mongoose.Schema({
 })
 
 
-export const UserModel = mongoose.model('user', userSchema);
+export const UserModel = mongoose.model<Users>('user', userSchema);

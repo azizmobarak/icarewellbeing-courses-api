@@ -1,5 +1,5 @@
 import { checkUserExistAndAuth } from "../../services/user/userConnection";
-
-export function login(req: any,res: any){
+import {Response, Request} from 'express';
+export function login(req: Request,res: Response){
     return checkUserExistAndAuth(res, req.body);
 }

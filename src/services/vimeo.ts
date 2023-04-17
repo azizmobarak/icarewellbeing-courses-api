@@ -1,5 +1,6 @@
+import { Courses } from "../models/courses";
 import { createResponse } from "../utils/resultStatus";
-import { Course, addCourse } from "./courses/coursesConnection";
+import { addCourse } from "./courses/coursesConnection";
 import { deleteVideoLocally } from "./uploadVideos";
 
 let Vimeo = require('vimeo').Vimeo;
@@ -12,7 +13,7 @@ export function getVimeoCourses(){
   }, function (_error: string, _body: any, _status_code: number, _headers: any) {})
 }
 
-export function uploadVimeoVideos (data: Course, res: any) {
+export function uploadVimeoVideos (data: Courses, res: any) {
     client.upload(
    'videos/'+data.video,
    {
@@ -27,7 +28,8 @@ export function uploadVimeoVideos (data: Course, res: any) {
     var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2)
     if(parseInt(percentage) === 100){
       setTimeout(()=>{
-        deleteVideoLocally('videos/'+data.video);
+        deleteVideoLocally('videos/'+data.video).then((value: boolean)=> console.log(value))
+        .catch(err => console.log(err));
       }, 6000)
 }
 

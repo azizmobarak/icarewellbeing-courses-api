@@ -1,3 +1,5 @@
+import { Response } from "express"
+
 export enum ErrorCodeStatus {
  FORBIDDEN = 403,
  NOT_FOUND = 404,
@@ -10,7 +12,7 @@ export enum ErrorCodeStatus {
  TIME_OUT_ERROR = 599,
 }
 
-export const responseErrorHandler = (status: ErrorCodeStatus, data: string | any, res: any) => {
+export const responseErrorHandler = (status: ErrorCodeStatus, data: any, res: Response) => {
    res.status(status).send({
        status,
        data,

@@ -1,8 +1,13 @@
 import { getCourses } from "../../services/courses/coursesConnection"
 import { decodToken } from "../../services/parseToken"
+import {Request, Response} from 'express';
 
-export const getCoursesByUserId = (req: any,res:any)=> {
-    console.log('helloooooo')
+interface RequestParams extends Request {
+    params: {page: string}
+}
+
+export const getCoursesByUserId = (req: RequestParams,res:Response)=> {
     const id = decodToken(req.cookies.access_token,res) || req.headers.id
-    getCourses(res,id.data, req.params.page);
+    // const id = req.body.id;
+    getCourses(res,id, parseInt(req.params.page));
 }

@@ -1,3 +1,3 @@
 import { checkUserEmailAndAddUser } from "../../services/user/userConnection"
-
-export const checkUserEmailExist = (req: any,res:any)=> checkUserEmailAndAddUser(res,req.body);
+import {Request, Response} from 'express';
+export const checkUserEmailExist = (req: Request,res:Response)=> checkUserEmailAndAddUser(res,req.body);
