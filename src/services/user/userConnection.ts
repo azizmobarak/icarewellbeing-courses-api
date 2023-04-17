@@ -15,16 +15,16 @@ export interface User {
   username: string;
 }
 
-export function verifyUserAuth (token: string, res: any) {
+export function verifyUserAuth (token: string, res: any, next:any) {
   const userModel = new UserModel();
-  const {data} = decodToken(token);
-  const id = new ObjectId(data);
+  const {data} = decodToken(token,res);
+  const id = new ObjectId(data.split(',')[0]);
   userModel.collection.findOne(sanitize({_id: id}))
   .then((doc: any) =>{
-      console.log(doc);
       if(!doc){
        return createResponse(403,`Not Authorized`,res);
       }
+      next();
   })
   .catch(()=>{
               return createResponse(403,`oops something happen Sorry, back again later`,res);
@@ -36,24 +36,22 @@ export function verifyUserAuth (token: string, res: any) {
         userModel.collection.findOne(sanitize({email: data.email}))
         .then((doc: any)=>{
              if(!doc){
-                return createResponse(403,`Sorry , Email or password is not correct`,res);
+                return createResponse(203,`Sorry , Email or password is not correct`,res);
              }else {
-                 checkPassword(doc.password, data.password, res)
-                 authorizeUser(doc._id, doc,res);
+                 checkPassword(doc, data.password, res)
              }
         }).catch(()=>{
-              return createResponse(403,`oops something happen Sorry, back again later`,res);
+              return createResponse(203,`oops something happen Sorry, back again later`,res);
         })
     }
 
-export function authorizeUser (id: string,data: User, res: any) {
-    const token = signUserAuth(id);
+export function authorizeUser (id: string,role: number,data: User, res: any) {
+    const token = signUserAuth(id,role);
    res.cookie("access_token", token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
     })
    .send({
-       token,
        data: {
            email: data.email,
            username: data.username,
@@ -70,19 +68,16 @@ export function checkUserEmailAndAddUser(res: any,data: User): void | boolean {
            if(!doc){
                 await AddNewUser(data.password, res, data);
            }else {
-                createResponse(403,`email ${data.email} already exist`,res);
+                createResponse(208,`email ${data.email} already exist`,res);
            }
-        }).catch((err: any)=>{
-            console.log(err)
+        }).catch((_err: any)=>{
             createResponse(403,`oops something happen Sorry, back again later`,res);
         })
 }
 
 async function AddNewUser (password: string, res: any, data: User){
-    console.log(password)
  await bcrypt.genSalt(saltRounds,async function(err: any, salt: any) { 
       if(err) return null;
-      console.log(salt)
   return await bcrypt.hash(password, salt, function(err: any, hash: any) {
           if(err) return null;
           return addUser(hash, res, data);
@@ -94,9 +89,9 @@ function addUser(hash: string, res: any, data: User) {
     const userModel = new UserModel();
     userModel.collection.insertOne(sanitize({...data, password: hash}))
     .then(doc => {
-        createResponse(200, doc, res);
+        createResponse(200, {email:data.email, role: data.role, username: data.username, ...doc}, res);
     })
     .catch(error => {
        createResponse(400, error, res);
     })
-   }
+}
