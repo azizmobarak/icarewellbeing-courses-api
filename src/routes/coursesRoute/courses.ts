@@ -1,7 +1,7 @@
 import { Request, Router } from "express";
 import { addCourses } from "../../controllers/courses/addCourses";
-import { isAuth } from "../../middlwares/authMiddlwares/authVefification";
 import { getCoursesByUserId } from "../../controllers/courses/getCourses";
+import { isAuth } from "../../middlewares/authMiddleware/middleware";
 
 const express = require('express');
 const CoursesRouter: Router = express.Router();
@@ -45,6 +45,6 @@ const upload = multer({
 export const uploadVideo = multer({ dest: "videos/", storage });
 
 CoursesRouter.route('/add/course').post(isAuth,upload.array('videos', 5), addCourses);
-CoursesRouter.route('/courses/:page').get(getCoursesByUserId);
+CoursesRouter.route('/courses/:page').get(isAuth,getCoursesByUserId);
 
 module.exports = CoursesRouter;

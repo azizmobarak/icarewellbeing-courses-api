@@ -1,9 +1,12 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
+require('dotenv').config()
 
+const connectionString =
+    process.env.NODE_ENV === 'DEV' ? process.env.DEV_DB : process.env.PRO_DB
 
-export function createDatabaseConnection () {
-   if(process.env.DB){
-      return  mongoose.connect(process.env.DB);
-   }
-  throw new Error('please add DB connection string to .env file')
+export function createDatabaseConnection() {
+    if (connectionString) {
+        return mongoose.connect(connectionString)
+    }
+    throw new Error('please add DB connection string to .env file')
 }

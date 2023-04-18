@@ -1,13 +1,19 @@
-import { getCourses } from "../../services/courses/coursesConnection"
-import { decodToken } from "../../services/parseToken"
-import {Request, Response} from 'express';
+import { getCourses } from '../../services/courses/coursesConnection'
+import { decodeToken } from '../../services/parseToken'
+import { Request, Response } from 'express'
+import { createResponse } from '../../utils/resultStatus'
 
-interface RequestParams extends Request {
-    params: {page: string}
-}
+type RequestParams = {
+    params: { page: string }
+} & Request
 
-export const getCoursesByUserId = (req: RequestParams,res:Response)=> {
-    const id = decodToken(req.cookies.access_token,res) || req.headers.id
-    // const id = req.body.id;
-    getCourses(res,id, parseInt(req.params.page));
+export const getCoursesByUserId = (req: RequestParams, res: Response) => {
+    return decodeToken(req.cookies.access_token, res)
+        .then((data: string) => {
+            const id = data.split(',')[0]
+            getCourses(res, id, parseInt(req.params.page))
+        })
+        .catch((_err: any) => {
+            createResponse(403, 'Session expired please login', res)
+        })
 }
