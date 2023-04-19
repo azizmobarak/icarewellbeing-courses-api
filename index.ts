@@ -38,10 +38,10 @@ app.use(function(_req: any, res: any, next: any) {
 const routes  = [userRouter, authRouter, coursesRouter];
 const appRouter = routes.reduce((router,route) => router.use(route))
 app.use('/api', appRouter);
-app.get('/',(_req:any,res:any)=> res.send('working'))
+app.get('/api',(_req:any,res:any)=> res.send('working'))
 
 
 
-app.listen(PORT, ()=>createDatabaseConnection());
+app.listen(PORT, ()=>{createDatabaseConnection();console.log(PORT)});
 
 
