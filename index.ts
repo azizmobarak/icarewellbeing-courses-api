@@ -42,6 +42,7 @@ app.use(
     })
 )
 
+
 const routes = [userRouter, authRouter, coursesRouter]
 const appRouter = routes.reduce((router, route) => router.use(route))
 app.use('/api', appRouter)

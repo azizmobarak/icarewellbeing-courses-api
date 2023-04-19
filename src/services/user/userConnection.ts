@@ -66,8 +66,10 @@ export function authorizeUser(
 ) {
     const token = signUserAuth(id, role, added_by)
     res.cookie('access_token', token, {
-        httpOnly: true,
+        httpOnly: false,
         secure: true,
+        sameSite: 'none',
+        domain: 'anmogar.com'
     }).send({
         data: {
             id,
