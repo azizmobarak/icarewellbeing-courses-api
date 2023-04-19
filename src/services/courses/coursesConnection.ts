@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { Response } from 'express'
 import { Courses, CoursesModel } from '../../models/courses'
 import { ErrorCodeStatus, responseErrorHandler } from '../../utils/ErrorHandler'
