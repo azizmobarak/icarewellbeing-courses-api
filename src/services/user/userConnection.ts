@@ -67,7 +67,7 @@ export function authorizeUser(
     const token = signUserAuth(id, role, added_by)
     res.cookie('access_token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'PRO',
+        secure: true,
     }).send({
         data: {
             id,
