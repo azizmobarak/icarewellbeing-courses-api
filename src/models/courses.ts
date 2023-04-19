@@ -1,38 +1,35 @@
 import mongoose from 'mongoose'
 
-
-export interface Courses {
-    video: string;
-    user_id: string;
-    name: string;
-    description: string;
+export type Courses = {
+    video: string
+    user_id: string
+    name: string
+    description: string
 }
 
-
-const courseSchema  = new mongoose.Schema<Courses>({
-  video: {
-      type: String,
-      max: 1000,
-      min: 4,
-      required: true,
-  },
-  user_id: {
-      type: String,
-      max: 400,
-      min: 2,
-      required: true,
-  },
-  name: {
-      type: String,
-      required: true,
-      max: 250,
-  },
-  description: {
-      type: String,
-      required: true,
-      max: 250,
-  }
+const courseSchema = new mongoose.Schema<Courses>({
+    video: {
+        type: String,
+        max: 1000,
+        min: 4,
+        required: true,
+    },
+    user_id: {
+        type: String,
+        max: 400,
+        min: 2,
+        required: true,
+    },
+    name: {
+        type: String,
+        required: true,
+        max: 250,
+    },
+    description: {
+        type: String,
+        required: true,
+        max: 250,
+    },
 })
 
-
-export const CoursesModel = mongoose.model<Courses>('course', courseSchema);
+export const CoursesModel = mongoose.model<Courses>('course', courseSchema)

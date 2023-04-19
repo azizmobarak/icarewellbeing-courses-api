@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs')
 // const multer = require("multer");
 // const upload = multer({ dest: "videos/" });
 
@@ -6,15 +6,14 @@ const fs = require('fs');
 
 // }
 
-export function deleteVideoLocally (fileName: string): Promise<boolean>{
-   return new Promise((resolve, reject)=>{
-     try {
-      fs.unlinkSync(fileName);
-      return resolve(true);
-     } catch (error) {
-       console.log(error);
-       reject(false);
-     }
-})
-
+export function deleteVideoLocally(fileName: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+        try {
+            fs.unlinkSync(fileName)
+            return resolve(true)
+        } catch (error) {
+            console.log(error)
+            reject(false)
+        }
+    })
 }
