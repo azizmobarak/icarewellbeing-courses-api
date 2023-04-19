@@ -21,12 +21,12 @@ const corsOptions = {
         if (!origin || whitelist.indexOf(origin) !== -1) {
             callback(null, true)
         } else {
-            callback(new Error('Not allowed by CORS'))
+            callback(new Error('Not allowed'))
         }
     },
     credentials: true,
 }
-
+app.use(express.json({limit: '5000mb'}))
 app.use(cors(corsOptions))
 app.use(
     bodyParser.urlencoded({
