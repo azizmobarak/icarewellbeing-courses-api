@@ -5,6 +5,7 @@ export type Courses = {
     user_id: string
     name: string
     description: string
+    module: any
 }
 
 const courseSchema = new mongoose.Schema<Courses>({
@@ -29,6 +30,11 @@ const courseSchema = new mongoose.Schema<Courses>({
         type: String,
         required: true,
         max: 250,
+    },
+    module: {
+        type: String,
+        require,
+        max: 240,
     },
 })
 

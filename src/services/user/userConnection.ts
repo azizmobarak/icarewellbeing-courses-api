@@ -69,7 +69,7 @@ export function authorizeUser(
         httpOnly: false,
         secure: true,
         sameSite: 'none',
-        domain: 'anmogar.com'
+        domain: 'anmogar.com',
     }).send({
         data: {
             id,

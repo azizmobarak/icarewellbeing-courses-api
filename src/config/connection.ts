@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import { initAppAdmin } from '../utils/databaseScriptRunner'
 require('dotenv').config()
 
 const connectionString =
@@ -7,9 +6,7 @@ const connectionString =
 
 export function createDatabaseConnection() {
     if (connectionString) {
-        return mongoose.connect(connectionString).then(()=>{
-         initAppAdmin();
-        })
+        return mongoose.connect(connectionString)
     }
     throw new Error('please add DB connection string to .env file')
 }

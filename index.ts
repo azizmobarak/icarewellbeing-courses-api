@@ -26,7 +26,7 @@ const corsOptions = {
     },
     credentials: true,
 }
-app.use(express.json({limit: '5000mb'}))
+app.use(express.json({ limit: '5000mb' }))
 app.use(cors(corsOptions))
 app.use(
     bodyParser.urlencoded({
@@ -41,7 +41,6 @@ app.use(
         limit: '5000mb',
     })
 )
-
 
 const routes = [userRouter, authRouter, coursesRouter]
 const appRouter = routes.reduce((router, route) => router.use(route))
