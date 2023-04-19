@@ -68,7 +68,6 @@ export function authorizeUser(
     res.cookie('access_token', token, {
         httpOnly: true,
         secure: true,
-        sameSite: 'none',
     }).send({
         data: {
             id,
