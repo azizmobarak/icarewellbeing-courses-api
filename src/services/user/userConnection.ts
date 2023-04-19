@@ -59,11 +59,12 @@ export function checkUserExistAndAuth(res: Response, data: Users): void {
 
 export function authorizeUser(
     id: string,
-    role: number,
+    role: string,
+    added_by: string,
     data: Users,
     res: Response
 ) {
-    const token = signUserAuth(id, role)
+    const token = signUserAuth(id, role, added_by)
     res.cookie('access_token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'PRO',

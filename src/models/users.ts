@@ -5,6 +5,7 @@ export type Users = {
     username: string
     password: string
     role: string
+    added_by: string
 }
 
 const userSchema = new mongoose.Schema<Users>({
@@ -28,6 +29,10 @@ const userSchema = new mongoose.Schema<Users>({
     role: {
         type: String,
         enum: [0, 1, 2],
+    },
+    added_by: {
+        type: String,
+        max: 255,
     },
 })
 

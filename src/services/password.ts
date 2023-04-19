@@ -32,7 +32,7 @@ export const checkPassword = (
                     res
                 )
             } else {
-                return authorizeUser(doc._id, doc.role, doc, res)
+                return authorizeUser(doc._id, doc.role, doc.added_by, doc, res)
             }
         }
     )

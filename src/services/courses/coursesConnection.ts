@@ -6,6 +6,7 @@ import {
     getPaginationByPageNumber,
 } from '../../utils/calculatePagination'
 import { createResponse } from '../../utils/resultStatus'
+import { fetchDataFromS3 } from '../awsS3service'
 const sanitize = require('mongo-sanitize')
 
 export function addCourse(data: Courses, res: Response) {
@@ -35,16 +36,21 @@ export async function getCourses(res: Response, id: string, page?: number) {
         courses.collection
             .countDocuments({ user_id: sanitize(id) })
             .then((doc: any) => {
-                pagination = getPaginationByPageNumber(doc, 50, 100, page)
-                getCoursesCollections(
-                    id,
-                    pagination.skip,
-                    pagination.limit,
-                    res,
-                    pagination.totalPages,
-                    pagination.currentPage,
-                    pagination.nenxtPage
-                )
+                console.log('count', doc)
+                if (doc === 0) {
+                    createResponse(200, [], res)
+                } else {
+                    pagination = getPaginationByPageNumber(doc, 50, 100, page)
+                    getCoursesCollections(
+                        id,
+                        pagination.skip,
+                        pagination.limit,
+                        res,
+                        pagination.totalPages,
+                        pagination.currentPage,
+                        pagination.nextPage
+                    )
+                }
             })
             .catch((_err) => {
                 return responseErrorHandler(
@@ -62,7 +68,7 @@ export async function getCourses(res: Response, id: string, page?: number) {
     }
 }
 
-const getCoursesCollections = (
+const getCoursesCollections = async (
     id: string,
     _skip: number,
     _limit: number,
@@ -71,26 +77,48 @@ const getCoursesCollections = (
     currentPage: number,
     nextPage: number
 ) => {
-    const courses = new CoursesModel()
-    const data: any[] = []
-    courses.collection.find(sanitize({ user_id: id })).forEach((value) => {
-        data.push(value)
-    })
-    setTimeout(() => {
-        verifyCoursesData(data, res, totalPages, currentPage, nextPage)
-    }, 3000)
+    getCoursesData(id)
+        .then(async (data) => {
+            if (data) {
+                await fetchDataFromS3(
+                    res,
+                    data,
+                    totalPages,
+                    currentPage,
+                    nextPage
+                )
+            } else {
+                createResponse(200, 'No Data', res)
+            }
+        })
+        .catch((err) => {
+            console.log(err)
+        })
 }
 
-const verifyCoursesData = (
-    data: any[],
-    res: any,
-    totalPages: number,
-    currentPage: number,
-    nextPage: number
-) => {
-    if (!data) {
-        createResponse(404, 'Not found', res)
-    } else {
-        createResponse(200, { data, totalPages, currentPage, nextPage }, res)
-    }
+async function getCoursesData(id: string): Promise<any[] | null> {
+    const courses = new CoursesModel()
+    const data: any[] = []
+    return new Promise(async (resolve, _reject) => {
+        await courses.collection
+            .find(sanitize({ user_id: id }))
+            .forEach((value) => {
+                data.push(value)
+            })
+        resolve(data)
+    })
 }
+
+// const verifyCoursesData = (
+//     data: any[],
+//     res: any,
+//     totalPages: number,
+//     currentPage: number,
+//     nextPage: number
+// ) => {
+//     if (!data) {
+//         createResponse(404, 'Not found', res)
+//     } else {
+//         createResponse(200, { data, totalPages, currentPage, nextPage }, res)
+//     }
+// }

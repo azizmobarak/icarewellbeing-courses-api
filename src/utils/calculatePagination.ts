@@ -3,7 +3,7 @@ export type Pagination = {
     limit: number
     currentPage: number
     totalPages: number
-    nenxtPage: number
+    nextPage: number
 }
 
 export function getPaginationByPageNumber(
@@ -18,7 +18,7 @@ export function getPaginationByPageNumber(
             limit,
             currentPage: 0,
             totalPages: totalPages,
-            nenxtPage: 0,
+            nextPage: 0,
         }
     }
 
@@ -29,7 +29,7 @@ export function getPaginationByPageNumber(
         limit,
         currentPage: page,
         totalPages: totalItems / limit,
-        nenxtPage: getNextPage(totalItems, limit, page),
+        nextPage: getNextPage(totalItems, limit, page),
     }
 }
 
