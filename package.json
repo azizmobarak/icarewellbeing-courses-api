@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.ts",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "jest",
         "start": "NODE_ENV=PRO ts-node index.ts",
         "dev": "NODE_ENV=DEV nodemon index.ts",
         "build": "npx tsc",
@@ -38,17 +38,25 @@
         "multer": "^1.4.5-lts.1",
         "nodemailer": "^6.9.1",
         "prettier": "^2.8.7",
+        "ts-node": "^10.9.1",
         "vimeo": "^2.3.1"
     },
     "devDependencies": {
+        "@babel/core": "^7.21.4",
+        "@babel/preset-env": "^7.21.4",
+        "@babel/preset-typescript": "^7.21.4",
         "@types/express": "^4.17.17",
+        "@types/jest": "^29.5.1",
         "@types/jsonwebtoken": "^9.0.1",
         "@types/mongo-sanitize": "^1.0.1",
         "@types/multer": "^1.4.7",
         "@types/node": "^18.15.11",
         "@types/nodemailer": "^6.4.7",
+        "babel-jest": "^29.5.0",
         "eslint-config-prettier": "^8.8.0",
+        "jest": "^29.5.0",
         "nodemon": "^2.0.22",
+        "ts-jest": "^29.1.0",
         "typescript": "^5.0.4"
     }
 }
