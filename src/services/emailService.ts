@@ -9,20 +9,15 @@ type EmailService = {
 export const sendPasswordEmail = (
     email: string,
     password: string
-): Promise<void> =>
-    new EmailServiceImpl(email).sendPasswordEmail(password)
-
-
+): Promise<void> => new EmailServiceImpl(email).sendPasswordEmail(password)
 
 // email service  to made managing sending emails easy
 class EmailServiceImpl implements EmailService {
-    constructor(
-        private readonly email: string
-    ) {}
+    constructor(private readonly email: string) {}
 
     async sendPasswordEmail(password: string) {
-        const subject = 'Welcome To Billivance E-Learning';
-        const message = `HI 👋 ,your account has been created 🔥, your password is ${password} \n and your login is ${this.email}`;
+        const subject = 'Welcome To Billivance E-Learning'
+        const message = `HI 👋 ,your account has been created 🔥, your password is ${password} \n and your login is ${this.email}`
         try {
             // create reusable transporter object using the default SMTP transport
             const transporter = await nodemailer.createTransport({
@@ -50,7 +45,6 @@ class EmailServiceImpl implements EmailService {
             console.log('Message sent: %s', info.messageId)
 
             console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info))
-
         } catch (error) {
             console.log(error)
         }

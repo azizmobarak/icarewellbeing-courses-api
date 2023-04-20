@@ -129,12 +129,17 @@ async function AddNewUser(password: string, res: Response, data: Users) {
     })
 }
 
-async function addUser(hash: string, res: Response, data: Users, password: string) {
+async function addUser(
+    hash: string,
+    res: Response,
+    data: Users,
+    password: string
+) {
     const userModel = new UserModel()
     userModel.collection
         .insertOne(sanitize({ ...data, password: hash }))
-        .then(async(doc) => {
-           await sendPasswordEmail(data.email,password);
+        .then(async (doc) => {
+            await sendPasswordEmail(data.email, password)
             createResponse(
                 200,
                 {
