@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 
 export type Modules = {
     name: string
+    added_by: string
 }
 
 const userSchema = new mongoose.Schema<Modules>({
@@ -9,6 +10,10 @@ const userSchema = new mongoose.Schema<Modules>({
         type: String,
         max: 200,
         min: 4,
+        required: true,
+    },
+    added_by: {
+        type: String,
         required: true,
     },
 })

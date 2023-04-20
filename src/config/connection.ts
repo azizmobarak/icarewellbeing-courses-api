@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config()
 
 const connectionString =

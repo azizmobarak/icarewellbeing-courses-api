@@ -10,11 +10,10 @@ import { ModuleModel } from '../../models/modules'
 // }
 
 export const addCourses = (req: any, res: Response) => {
-    console.log(req.file)
     decodeToken(req.cookies.access_token, res)
         .then((result: string) => {
             if (result) {
-                saveModule(req.body.module)
+                saveModule(req.body.module, req.cookies.access_token)
                     .then((moduleId) => {
                         const id = result.split(',')[0]
                         const data = {
@@ -23,6 +22,7 @@ export const addCourses = (req: any, res: Response) => {
                             name: req.body.name,
                             description: req.body.description,
                             module: moduleId,
+                            author: req.body.author,
                         }
                         return uploadFileToS3(
                             data,
@@ -41,14 +41,13 @@ export const addCourses = (req: any, res: Response) => {
                         )
                     })
                 // return uploadVimeoVideos(data, res)
-            }else {
+            } else {
                 return createResponse(
-                403,
-                'cannot define the user please try later or login again',
-                res
-            )
+                    403,
+                    'cannot define the user please try later or login again',
+                    res
+                )
             }
-            
         })
         .catch(() =>
             createResponse(
@@ -59,16 +58,16 @@ export const addCourses = (req: any, res: Response) => {
         )
 }
 
-function saveModule(name: string) {
-    const module = new ModuleModel({ name })
+function saveModule(name: string, token: string) {
+    const added_by = token
+    const module = new ModuleModel({ name, added_by })
     const getID = module.save()
     return new Promise(
         (resolve: CallableFunction, reject: CallableFunction) => {
             getID.then((value) => {
-                if(!value){
-                  reject();
-                }
-                else {
+                if (!value) {
+                    reject()
+                } else {
                     resolve(value._id.toString())
                 }
             })

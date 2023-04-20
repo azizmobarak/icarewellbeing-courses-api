@@ -3,7 +3,6 @@ import { Response, Request, NextFunction } from 'express'
 import { createResponse } from '../../utils/resultStatus'
 
 export function isAuth(req: Request, res: Response, next: NextFunction): void {
-    console.log('toooken', req.cookies.access_token)
     verifyUserAuth(req.cookies.access_token, res)
         .then((result) => {
             if (result) {

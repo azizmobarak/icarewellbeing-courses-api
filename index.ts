@@ -6,6 +6,7 @@ const express = require('express')
 const userRouter = require('./src/routes/usersRoute/router')
 const authRouter = require('./src/routes/authRoute/login')
 const coursesRouter = require('./src/routes/coursesRoute/courses')
+const ModuleRouter = require('./src/routes/modulesRoute/modules')
 const app = express()
 const PORT = process.env.PORT || 2222
 const bodyParser = require('body-parser')
@@ -42,7 +43,7 @@ app.use(
     })
 )
 
-const routes = [userRouter, authRouter, coursesRouter]
+const routes = [userRouter, authRouter, coursesRouter, ModuleRouter]
 const appRouter = routes.reduce((router, route) => router.use(route))
 app.use('/api', appRouter)
 app.get('/', (_req: any, res: any) => res.send('working'))

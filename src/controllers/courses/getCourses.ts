@@ -2,6 +2,7 @@ import { decodeToken } from '../../services/parseToken'
 import { Request, Response } from 'express'
 import { createResponse } from '../../utils/resultStatus'
 import { getCourses } from '../../services/courses/coursesConnection'
+import { getAddedByOrID } from '../../utils/userUtils'
 
 type RequestParams = {
     params: { page: string }
@@ -21,17 +22,6 @@ export const getCoursesByUserId = (req: RequestParams, res: Response) => {
 function getRoleAndID(decodedToken: string): { id: string; role: string } {
     return {
         role: decodedToken.split(',')[1],
-        id: useAddedByIDInsteadOfID(decodedToken),
-    }
-}
-
-function useAddedByIDInsteadOfID(decodedToken: string): string {
-    const role = decodedToken.split(',')[1]
-    console.log('detected role', role)
-    switch (role) {
-        case '2':
-            return decodedToken.split(',')[2]
-        default:
-            return decodedToken.split(',')[0]
+        id: getAddedByOrID(decodedToken),
     }
 }
