@@ -3,9 +3,9 @@ import { addCourses } from '../../controllers/courses/addCourses'
 import { getCoursesByUserId } from '../../controllers/courses/getCourses'
 import { isAuth } from '../../middlewares/authMiddleware/middleware'
 
-const express = require('express')
+import express from 'express'
 const CoursesRouter: Router = express.Router()
-const multer = require('multer')
+import multer from 'multer'
 // import path from 'path'
 
 const storage = multer.memoryStorage()

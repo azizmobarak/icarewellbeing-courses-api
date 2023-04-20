@@ -6,7 +6,10 @@ export type Courses = {
     name: string
     description: string
     module: any
+    author: string
 }
+
+// author missed
 
 const courseSchema = new mongoose.Schema<Courses>({
     video: {
@@ -35,6 +38,11 @@ const courseSchema = new mongoose.Schema<Courses>({
         type: String,
         require,
         max: 240,
+    },
+    author: {
+        type: String,
+        require,
+        max: 200,
     },
 })
 

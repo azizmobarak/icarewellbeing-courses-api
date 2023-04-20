@@ -3,11 +3,13 @@ import { checkPassword } from '../password'
 import { createResponse } from '../../utils/resultStatus'
 import { signUserAuth } from '../createToken'
 import { decodeToken } from '../parseToken'
-import { Response } from 'express'
+import { CookieOptions, Response } from 'express'
 import { HydratedDocument } from 'mongoose'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const ObjectId = require('mongodb').ObjectId
-const sanitize = require('mongo-sanitize')
-const bcrypt = require('bcrypt')
+import sanitize from 'mongo-sanitize'
+import bcrypt from 'bcrypt'
+import { sendPasswordEmail } from '../emailService'
 const saltRounds = 10
 
 export function verifyUserAuth(token: string, res: Response) {
@@ -61,16 +63,25 @@ export function authorizeUser(
     id: string,
     role: string,
     added_by: string,
+    email: string,
     data: Users,
     res: Response
 ) {
-    const token = signUserAuth(id, role, added_by)
-    res.cookie('access_token', token, {
-        httpOnly: false,
-        secure: true,
-        sameSite: 'none',
-        domain: 'anmogar.com',
-    }).send({
+    const cookieConfig: CookieOptions =
+        process.env.NODE_DEV !== 'PRO'
+            ? {
+                  httpOnly: true,
+                  secure: false,
+              }
+            : {
+                  httpOnly: false,
+                  secure: true,
+                  sameSite: 'none',
+                  domain: process.env.DOMAINE,
+              }
+
+    const token = signUserAuth(id, role, added_by, email)
+    res.cookie('access_token', token, cookieConfig).send({
         data: {
             id,
             email: data.email,
@@ -105,24 +116,25 @@ export function checkUserEmailAndAddUser(
 }
 
 async function AddNewUser(password: string, res: Response, data: Users) {
-    await bcrypt.genSalt(saltRounds, async function (err: any, salt: any) {
+    await bcrypt.genSalt(saltRounds, async function (err: any, salt: string) {
         if (err) return null
         return await bcrypt.hash(
             password,
             salt,
-            function (err: any, hash: any) {
+            function (err: any, hash: string) {
                 if (err) return null
-                return addUser(hash, res, data)
+                return addUser(hash, res, data, password)
             }
         )
     })
 }
 
-function addUser(hash: string, res: Response, data: Users) {
+async function addUser(hash: string, res: Response, data: Users, password: string) {
     const userModel = new UserModel()
     userModel.collection
         .insertOne(sanitize({ ...data, password: hash }))
-        .then((doc) => {
+        .then(async(doc) => {
+           await sendPasswordEmail(data.email,password);
             createResponse(
                 200,
                 {

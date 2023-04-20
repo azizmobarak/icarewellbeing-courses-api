@@ -2,7 +2,7 @@ import { Response } from 'express'
 import { createResponse } from '../utils/resultStatus'
 import { authorizeUser } from './user/userConnection'
 import { HydratedDocument } from 'mongoose'
-
+/* eslint-disable @typescript-eslint/no-var-requires */
 const bcrypt = require('bcrypt')
 const saltRounds = 22
 
@@ -32,7 +32,7 @@ export const checkPassword = (
                     res
                 )
             } else {
-                return authorizeUser(doc._id, doc.role, doc.added_by, doc, res)
+                return authorizeUser(doc._id, doc.role, doc.added_by, doc.email, doc, res)
             }
         }
     )

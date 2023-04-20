@@ -37,7 +37,6 @@ export async function getCourses(res: Response, id: string, page?: number) {
         courses.collection
             .countDocuments({ user_id: sanitize(id) })
             .then((doc: any) => {
-                console.log('count', doc)
                 if (doc === 0) {
                     createResponse(200, [], res)
                 } else {
@@ -92,22 +91,20 @@ const getCoursesCollections = async (
                 createResponse(200, 'No Data', res)
             }
         })
-        .catch((err) => {
-            console.log(err)
+        .catch((_err: string) => {
+            createResponse(403, 'an is error is thrown, please try again', res)
         })
 }
 
 async function getCoursesData(id: string): Promise<any[] | null> {
     const courses = new CoursesModel()
     const data: any[] = []
-    return new Promise(async (resolve, _reject) => {
-        await courses.collection
-            .find(sanitize({ user_id: id }))
-            .forEach((value) => {
-                data.push(value)
-            })
-        resolve(data)
-    })
+    await courses.collection
+        .find(sanitize({ user_id: id }))
+        .forEach((value) => {
+            data.push(value)
+        })
+    return data
 }
 
 // const verifyCoursesData = (
