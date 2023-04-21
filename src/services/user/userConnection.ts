@@ -9,7 +9,7 @@ import { HydratedDocument } from 'mongoose'
 const ObjectId = require('mongodb').ObjectId
 import sanitize from 'mongo-sanitize'
 import bcrypt from 'bcrypt'
-import { sendPasswordEmail } from '../emailService'
+// import { sendPasswordEmail } from '../emailService'
 const saltRounds = 10
 
 export function verifyUserAuth(token: string, res: Response) {
@@ -123,7 +123,7 @@ async function AddNewUser(password: string, res: Response, data: Users) {
             salt,
             function (err: any, hash: string) {
                 if (err) return null
-                return addUser(hash, res, data, password)
+                return addUser(hash, res, data)
             }
         )
     })
@@ -133,13 +133,13 @@ async function addUser(
     hash: string,
     res: Response,
     data: Users,
-    password: string
+    // password: string
 ) {
     const userModel = new UserModel()
     userModel.collection
         .insertOne(sanitize({ ...data, password: hash }))
         .then(async (doc) => {
-            await sendPasswordEmail(data.email, password)
+            // await sendPasswordEmail(data.email, password)
             createResponse(
                 200,
                 {

@@ -10,27 +10,6 @@ import multer from 'multer'
 
 const storage = multer.memoryStorage()
 
-// function checkFileType(file: any, cb: any) {
-//     const filetypes = /mp4|mp3|png/ // Choose Types you want...
-//     const extname = filetypes.test(
-//         path.extname(file.originalname).toLowerCase()
-//     )
-//     const mimetype = filetypes.test(file.mimetype)
-
-//     if (extname && mimetype) {
-//         return cb(null, true)
-//     } else {
-//         cb('Videos only!') // custom this message to fit your needs
-//     }
-// }
-
-// const upload = multer({
-//     storage,
-//     fileFilter: function (_req: Request, file: any, cb: any) {
-//         checkFileType(file, cb)
-//     },
-// })
-
 export const uploadVideo = multer({ storage })
 
 CoursesRouter.route('/add/course').post(
