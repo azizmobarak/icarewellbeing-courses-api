@@ -14,6 +14,7 @@ export function addCourse(data: Courses, res: Response) {
     try {
         const courses = new CoursesModel(sanitize(data))
         courses.save()
+        console.log('video added to database')
         createResponse(
             202,
             {
