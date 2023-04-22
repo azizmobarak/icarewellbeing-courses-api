@@ -71,7 +71,10 @@ export function authorizeUser(
         process.env.NODE_DEV !== 'PRO'
             ? {
                   httpOnly: true,
-                  secure: false,
+                  secure: true,
+                  sameSite: 'strict',
+                  maxAge: 60 * 60 * 24 * 30,
+                  path: '/',
               }
             : {
                   httpOnly: false,
@@ -132,7 +135,7 @@ async function AddNewUser(password: string, res: Response, data: Users) {
 async function addUser(
     hash: string,
     res: Response,
-    data: Users,
+    data: Users
     // password: string
 ) {
     const userModel = new UserModel()

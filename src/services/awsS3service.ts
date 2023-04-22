@@ -35,12 +35,12 @@ export async function uploadFileToS3(
     await client
         .send(command)
         .then((result) => {
-            console.log('video uploaded to s3',result)
+            console.log('video uploaded to s3', result)
             const course = { ...data, video: params.Key }
             addCourse(course, res)
         })
         .catch((err) => {
-            console.log('video s3 error',err)
+            console.log('video s3 error', err)
         })
 }
 
