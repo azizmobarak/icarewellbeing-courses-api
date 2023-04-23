@@ -6,6 +6,7 @@ import { Response } from 'express'
 import { addCourse } from './courses/coursesConnection'
 import { createResponse } from '../utils/resultStatus'
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner')
+import fs from 'fs';
 
 const s3Config = {
     region: process.env.AWS_REGION,
@@ -24,10 +25,10 @@ export async function uploadFileToS3(
     mimeType: string,
     res: Response
 ) {
-    const imageName = crypt.randomBytes(20).toString('hex')
+    const videoName = crypt.randomBytes(20).toString('hex')
     const params = {
         Bucket: process.env.BUCKET_NAME || '',
-        Key: imageName + data.user_id + originalName,
+        Key: videoName + data.user_id + originalName,
         Body: buffer,
         ContentType: mimeType,
     }
@@ -37,6 +38,9 @@ export async function uploadFileToS3(
         .then((result) => {
             console.log('video uploaded to s3', result)
             const course = { ...data, video: params.Key }
+            setTimeout(() => {
+                fs.unlinkSync('/videos/'+ originalName);
+            }, 4000);
             addCourse(course, res)
         })
         .catch((err) => {

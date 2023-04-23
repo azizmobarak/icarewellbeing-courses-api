@@ -6,11 +6,18 @@ import { isAuth } from '../../middlewares/authMiddleware/middleware'
 import express from 'express'
 const CoursesRouter: Router = express.Router()
 import multer from 'multer'
-// import path from 'path'
 
-const storage = multer.memoryStorage()
+const storage = multer.diskStorage({
+  destination: function (_req, _file, cb) {
+    cb(null, "./videos")
+  },
+  filename: function (_req, file, cb) {
+    cb(null,file.originalname)
+  },
+});
 
-export const uploadVideo = multer({ storage })
+const uploadVideo = multer({storage})
+
 
 CoursesRouter.route('/add/course').post(
     isAuth,

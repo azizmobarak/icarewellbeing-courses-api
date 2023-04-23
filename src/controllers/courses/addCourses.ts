@@ -1,36 +1,45 @@
 import { decodeToken } from '../../services/parseToken'
 import { Response } from 'express'
 import { createResponse } from '../../utils/resultStatus'
-import { uploadFileToS3 } from '../../services/awsS3service'
+// import { uploadFileToS3 } from '../../services/awsS3service'
 import { ModuleModel } from '../../models/modules'
+import fs from 'fs';
+import path from 'path';
 
 //TODO: fix typing
 // interface RequestWithFile extends Request {
 //     files: {filename: string}[];
 // }
 
-export const addCourses = (req: any, res: Response) => {
-    decodeToken(req.cookies.access_token, res)
-        .then((result: string) => {
+export const addCourses = async(req: any, res: Response) => {
+   await decodeToken(req.cookies.access_token, res)
+        .then(async(result: string) => {
             if (result) {
-                saveModule(req.body.module, req.cookies.access_token)
-                    .then((moduleId) => {
-                        const id = result.split(',')[0]
-                        const data = {
-                            user_id: id,
-                            video: req.file.filename,
-                            name: req.body.name,
-                            description: req.body.description,
-                            module: moduleId,
-                            author: req.body.author,
-                        }
-                        return uploadFileToS3(
-                            data,
-                            req.file.filename,
-                            req.file.buffer,
-                            req.file.mimetype,
-                            res
-                        )
+              await saveModule(req.body.module, req.cookies.access_token)
+                    .then(async(_moduleId) => {
+                      setTimeout(async() => {
+                        const filepath = path.join(__dirname, 'videos/'+'empty');
+                        const data = await fs.readFileSync(filepath);
+                        console.log(data,'   \tbuffer');
+                      }, 10000);
+                //         do{
+                //              const id = result.split(',')[0]
+                //         const data = {
+                //             user_id: id,
+                //             video: req.file.filename,
+                //             name: req.body.name,
+                //             description: req.body.description,
+                //             module: moduleId,
+                //             author: req.body.author,
+                //         }
+                //  await uploadFileToS3(
+                //             data,
+                //             req.file.filename,
+                //             buffer,
+                //             req.file.mimetype,
+                //             res
+                //         )
+                //         }while(!buffer)
                     })
                     .catch((e) => {
                         console.log(e)
