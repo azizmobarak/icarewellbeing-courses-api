@@ -3,13 +3,28 @@ import { Response } from 'express'
 import { createResponse } from '../../utils/resultStatus'
 // import { uploadFileToS3 } from '../../services/awsS3service'
 import { ModuleModel } from '../../models/modules'
-import fs from 'fs';
-import path from 'path';
+// import fs from 'fs';
+// import path from 'path';
+const ffmpeg = require('ffmpeg');
 
 //TODO: fix typing
 // interface RequestWithFile extends Request {
 //     files: {filename: string}[];
 // }
+
+function compressVideo (buffer: string){
+    try {
+        var process = new ffmpeg(buffer);
+        process.then(function (video: any) {
+            console.log('The video is ready to be processed', video);
+        }, function (err: string) {
+            console.log('Error: ' + err);
+        });
+    } catch (e: any) {
+        console.log(e.code);
+        console.log(e.msg);
+    }
+}
 
 export const addCourses = async(req: any, res: Response) => {
    await decodeToken(req.cookies.access_token, res)
@@ -17,11 +32,12 @@ export const addCourses = async(req: any, res: Response) => {
             if (result) {
               await saveModule(req.body.module, req.cookies.access_token)
                     .then(async(_moduleId) => {
-                      setTimeout(async() => {
-                        const filepath = path.join(__dirname, 'videos/'+'empty');
-                        const data = await fs.readFileSync(filepath);
-                        console.log(data,'   \tbuffer');
-                      }, 10000);
+                       await compressVideo(req.file.buffer);
+                    //   setTimeout(async() => {
+                    //     // const filepath = path.join(__dirname, 'videos/'+'empty');
+                    //     // const data = await fs.readFileSync(filepath);
+                          
+                    //   }, 10000);
                 //         do{
                 //              const id = result.split(',')[0]
                 //         const data = {

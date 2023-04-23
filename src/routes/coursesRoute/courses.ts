@@ -7,14 +7,17 @@ import express from 'express'
 const CoursesRouter: Router = express.Router()
 import multer from 'multer'
 
-const storage = multer.diskStorage({
-  destination: function (_req, _file, cb) {
-    cb(null, "./videos")
-  },
-  filename: function (_req, file, cb) {
-    cb(null,file.originalname)
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: function (_req, _file, cb) {
+//     cb(null, "./videos")
+//   },
+//   filename: function (_req, file, cb) {
+//     //   console.log('size of file ',file.size);
+//     cb(null,file.originalname)
+//   },
+// });
+
+const storage = multer.memoryStorage();
 
 const uploadVideo = multer({storage})
 
