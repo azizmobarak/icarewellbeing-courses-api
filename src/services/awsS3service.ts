@@ -17,6 +17,15 @@ const s3Config = {
 
 const client = new AWS.S3(s3Config)
 
+// const accParams = {
+//         Bucket: process.env.BUCKET_NAME || '',
+//         AccelerateConfiguration: { /* required */
+//            Status: 'Enabled'
+//         },
+//     }
+ 
+// client.putBucketAccelerateConfiguration(accParams);
+
 export async function uploadFileToS3(
     data: Courses,
     originalName: string,
@@ -31,6 +40,7 @@ export async function uploadFileToS3(
         Body: buffer,
         ContentType: mimeType,
     }
+
     const command = new AWS.PutObjectCommand(params)
     await client
         .send(command)
