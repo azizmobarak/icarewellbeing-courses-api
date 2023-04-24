@@ -10,6 +10,7 @@ import { ModuleModel } from '../../models/modules'
 // }
 
 export const addCourses = (req: any, res: Response) => {
+    req.setTimeout(12000000);
     decodeToken(req.cookies.access_token, res)
         .then((result: string) => {
             if (result) {

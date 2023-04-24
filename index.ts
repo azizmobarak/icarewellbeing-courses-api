@@ -54,4 +54,5 @@ app.get('/', (_req: any, res: any) => res.send('working'))
 //     io.on('', () => console.log('hyy'))
 //     io.emit('', () => console.log('hyy 2'))
 // });
-app.listen(PORT, () => createDatabaseConnection())
+app.listen(PORT, () => createDatabaseConnection());
+
