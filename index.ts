@@ -10,26 +10,26 @@ const ModuleRouter = require('./src/routes/modulesRoute/modules')
 const app = express()
 const PORT = process.env.PORT || 2222
 const bodyParser = require('body-parser')
-// const cors = require('cors')
+const cors = require('cors')
 const cookieParser = require('cookie-parser')
 
-// const domainsFromEnv = process.env.CORS_DOMAINS || '*'
+const domainsFromEnv = process.env.CORS_DOMAINS || '*'
 
-// const whitelist = domainsFromEnv.split(',').map((item) => item.trim())
+const whitelist = domainsFromEnv.split(',').map((item) => item.trim())
 
-// const corsOptions = {
-//     origin: function (origin: any, callback: CallableFunction) {
-//         if (!origin || whitelist.indexOf(origin) !== -1) {
-//             callback(null, true)
-//         } else {
-//             callback(new Error('Not allowed'))
-//         }
-//     },
-//     credentials: true,
-// }
+const corsOptions = {
+    origin: function (origin: any, callback: CallableFunction) {
+        if (!origin || whitelist.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed'))
+        }
+    },
+    credentials: true,
+}
 
 app.use(express.json({ limit: '5000mb' }))
-// app.use(cors(corsOptions))
+app.use(cors(corsOptions))
 app.use(
     bodyParser.urlencoded({
         limit: '5000mb',
