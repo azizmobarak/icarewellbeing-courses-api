@@ -73,7 +73,7 @@ export function authorizeUser(
                   httpOnly: true,
                   secure: true,
                   sameSite: 'strict',
-                  maxAge: 60 * 60 * 24 * 30,
+                //   maxAge: 60 * 60 * 24 * 30,
                   path: '/',
               }
             : {
