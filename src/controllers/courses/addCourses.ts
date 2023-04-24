@@ -1,7 +1,7 @@
 import { decodeToken } from '../../services/parseToken'
 import { Response } from 'express'
 import { createResponse } from '../../utils/resultStatus'
-import { uploadFileToS3 } from '../../services/awsS3service'
+import { uploadToS3 } from '../../services/awsS3service'
 import { ModuleModel } from '../../models/modules'
 
 //TODO: fix typing
@@ -24,9 +24,9 @@ export const addCourses = (req: any, res: Response) => {
                             module: moduleId,
                             author: req.body.author,
                         }
-                        return uploadFileToS3(
+                        return uploadToS3(
                             data,
-                            req.file.filename,
+                            req.body.name,
                             req.file.buffer,
                             req.file.mimetype,
                             res
