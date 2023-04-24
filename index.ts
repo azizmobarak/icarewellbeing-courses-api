@@ -14,22 +14,22 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 // import { Server } from "socket.io";
 
-const domainsFromEnv = process.env.CORS_DOMAINS || '*'
+// const domainsFromEnv = process.env.CORS_DOMAINS || '*'
 
-const whitelist = domainsFromEnv.split(',').map((item) => item.trim())
+// const whitelist = domainsFromEnv.split(',').map((item) => item.trim())
 
-const corsOptions = {
-    origin: function (origin: any, callback: CallableFunction) {
-        if (!origin || whitelist.indexOf(origin) !== -1) {
-            callback(null, true)
-        } else {
-            callback(new Error('Not allowed'))
-        }
-    },
-    credentials: true,
-}
+// const corsOptions = {
+//     origin: function (origin: any, callback: CallableFunction) {
+//         if (!origin || whitelist.indexOf(origin) !== -1) {
+//             callback(null, true)
+//         } else {
+//             callback(new Error('Not allowed'))
+//         }
+//     },
+//     credentials: true,
+// }
 app.use(express.json({ limit: '5000mb' }))
-app.use(cors(corsOptions))
+app.use(cors())
 app.use(
     bodyParser.urlencoded({
         limit: '5000mb',
