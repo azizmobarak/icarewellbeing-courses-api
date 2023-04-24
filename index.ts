@@ -49,7 +49,6 @@ const appRouter = routes.reduce((router, route) => router.use(route))
 app.use('/api', appRouter)
 app.get('/', (_req: any, res: any) => res.send('working'))
 
-
 // const io = new Server(app);
 // io.on("connection", (_socket) => {
 //     io.on('', () => console.log('hyy'))

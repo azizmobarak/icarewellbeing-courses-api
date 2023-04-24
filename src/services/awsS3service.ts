@@ -6,6 +6,7 @@ import { Response } from 'express'
 import { addCourse } from './courses/coursesConnection'
 import { createResponse } from '../utils/resultStatus'
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner')
+import { Upload } from '@aws-sdk/lib-storage'
 
 const s3Config = {
     region: process.env.AWS_REGION,
@@ -17,33 +18,76 @@ const s3Config = {
 
 const client = new AWS.S3(s3Config)
 
-export async function uploadFileToS3(
+const imageName = crypt.randomBytes(20).toString('hex')
+
+export const uploadToS3 = async (
     data: Courses,
     originalName: string,
     buffer: Buffer,
     mimeType: string,
     res: Response
-) {
-    const imageName = crypt.randomBytes(20).toString('hex')
-    const params = {
-        Bucket: process.env.BUCKET_NAME || '',
-        Key: imageName + data.user_id + originalName,
-        Body: buffer,
-        ContentType: mimeType,
+) => {
+    // const pass = new stream.Passthrough({});
+    try {
+        const params = {
+            Bucket: process.env.BUCKET_NAME || '',
+            Key: imageName + data.user_id + originalName.replace(' ', ''),
+            Body: buffer,
+            ContentType: mimeType,
+        }
+        const uploadToS3 = new Upload({
+            client,
+            queueSize: 4,
+            partSize: 5242880,
+            leavePartsOnError: false,
+            params: params,
+        })
+
+        // pass.write("Hello");
+        // pass.end();
+
+        await uploadToS3
+            .done()
+            .then((result: any) => {
+                console.log(result)
+                const course = { ...data, video: params.Key }
+                addCourse(course, res)
+            })
+            .catch((err) => {
+                console.log('video s3 error', err)
+                createResponse(500, 'cannot upload video please try later', res)
+            })
+    } catch (e) {
+        console.log(e)
     }
-    const command = new AWS.CreateMultipartUploadCommand(params)
-    // client.putObject(params, (_err: any, data: any) => console.log(data)).on('httpUploadProgress', (value: any) => console.log(value));
-    await client
-        .send(command)
-        .then((result) => {
-            console.log('video uploaded to s3', result)
-            const course = { ...data, video: params.Key }
-            addCourse(course, res)
-        })
-        .catch((err) => {
-            console.log('video s3 error', err)
-        })
 }
+
+// for images upload use this function
+// export async function uploadFileToS3(
+//     data: Courses,
+//     originalName: string,
+//     buffer: Buffer,
+//     mimeType: string,
+//     res: Response
+// ) {
+//     const params = {
+//         Bucket: process.env.BUCKET_NAME || '',
+//         Key: imageName + data.user_id + originalName,
+//         Body: buffer,
+//         ContentType: mimeType,
+//     }
+//     const command = new AWS.CreateMultipartUploadCommand(params)
+//     await client
+//         .send(command)
+//         .then((result) => {
+//             console.log('video uploaded to s3', result)
+//             const course = { ...data, video: params.Key }
+//             addCourse(course, res)
+//         })
+//         .catch((err) => {
+//             console.log('video s3 error', err)
+//         })
+// }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function fetchDataFromS3(
