@@ -6,8 +6,6 @@ import { Response } from 'express'
 import { addCourse } from './courses/coursesConnection'
 import { createResponse } from '../utils/resultStatus'
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner')
-// import { Upload } from '@aws-sdk/lib-storage'
-// import fs from 'fs';
 
 const s3Config = {
     region: process.env.AWS_REGION,
@@ -16,6 +14,7 @@ const s3Config = {
         secretAccessKey: process.env.AWS_ACCESS_SECRET || '',
     },
 }
+
 
 const client = new AWS.S3(s3Config)
 
