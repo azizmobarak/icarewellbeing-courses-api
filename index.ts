@@ -27,9 +27,11 @@ const corsOptions = {
     },
     credentials: true,
 }
+app.use(cors(corsOptions))
+
+app.options('*', cors())
 
 app.use(express.json({ limit: '5000mb' }))
-app.use(cors(corsOptions))
 app.use(
     bodyParser.urlencoded({
         limit: '5000mb',
