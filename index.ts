@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 2222
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
+// import { Server } from "socket.io";
 
 const domainsFromEnv = process.env.CORS_DOMAINS || '*'
 
@@ -48,4 +49,10 @@ const appRouter = routes.reduce((router, route) => router.use(route))
 app.use('/api', appRouter)
 app.get('/', (_req: any, res: any) => res.send('working'))
 
+
+// const io = new Server(app);
+// io.on("connection", (_socket) => {
+//     io.on('', () => console.log('hyy'))
+//     io.emit('', () => console.log('hyy 2'))
+// });
 app.listen(PORT, () => createDatabaseConnection())
