@@ -27,6 +27,7 @@ async function initiateMultipartUpload(key: string,bucket: string) {
     try {
       return await client.send(new AWS.CreateMultipartUploadCommand({Key: key, Bucket: bucket}))
     } catch (err) {
+        console.log(err);
         return err;
         // error handler function here
     }
@@ -40,6 +41,7 @@ async function uploadPart(body: any, UploadId: string, partNumber: number, data:
         UploadId: UploadId,
         PartNumber: partNumber
     }
+    console.log('part uploaded');
     return new Promise(async (resolve, reject) => {
         try {
             let part = await client.send(new AWS.UploadPartCommand(partParams))
@@ -92,6 +94,8 @@ export const uploadToS3 = async (
 
             slicedData.push({ PartNumber: index, buffer: Buffer.from(buffer.slice(start, end + 1)) });
         }
+
+        console.log('start upload all');
 
         Parts = await Promise.allSettled(promise);
         FailedUploads = Parts.filter(f => f.status == "rejected");
