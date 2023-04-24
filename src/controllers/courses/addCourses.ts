@@ -29,6 +29,7 @@ export const addCourses = (req: any, res: Response) => {
                             req.body.name,
                             req.file.buffer,
                             req.file.mimetype,
+                            req.file.size,
                             res
                         )
                     })
