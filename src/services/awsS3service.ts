@@ -31,7 +31,8 @@ export async function uploadFileToS3(
         Body: buffer,
         ContentType: mimeType,
     }
-    const command = new AWS.PutObjectCommand(params)
+    const command = new AWS.CreateMultipartUploadCommand(params)
+    // client.putObject(params, (_err: any, data: any) => console.log(data)).on('httpUploadProgress', (value: any) => console.log(value));
     await client
         .send(command)
         .then((result) => {
