@@ -12,32 +12,23 @@ const PORT = process.env.PORT || 2222
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-// import { Server } from "socket.io";
 
+const domainsFromEnv = process.env.CORS_DOMAINS || '*'
 
-app.use((_req: any, res: any, next: any) => {
-    res.header(`Access-Control-Allow-Origin`, `*`);
-    res.header(`Access-Control-Allow-Methods`, `GET,PUT,POST,DELETE`);
-    res.header(`Access-Control-Allow-Headers`, `Content-Type`);
-    next();
-});
+const whitelist = domainsFromEnv.split(',').map((item) => item.trim())
 
-// const domainsFromEnv = process.env.CORS_DOMAINS || '*'
-
-// const whitelist = domainsFromEnv.split(',').map((item) => item.trim())
-
-// const corsOptions = {
-//     origin: function (origin: any, callback: CallableFunction) {
-//         if (!origin || whitelist.indexOf(origin) !== -1) {
-//             callback(null, true)
-//         } else {
-//             callback(new Error('Not allowed'))
-//         }
-//     },
-//     credentials: true,
-// }
+const corsOptions = {
+    origin: function (origin: any, callback: CallableFunction) {
+        if (!origin || whitelist.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed'))
+        }
+    },
+    credentials: true,
+}
 app.use(express.json({ limit: '5000mb' }))
-app.use(cors())
+app.use(cors(corsOptions))
 app.use(
     bodyParser.urlencoded({
         limit: '5000mb',
@@ -57,10 +48,4 @@ const appRouter = routes.reduce((router, route) => router.use(route))
 app.use('/api', appRouter)
 app.get('/', (_req: any, res: any) => res.send('working'))
 
-// const io = new Server(app);
-// io.on("connection", (_socket) => {
-//     io.on('', () => console.log('hyy'))
-//     io.emit('', () => console.log('hyy 2'))
-// });
-app.listen(PORT, () => createDatabaseConnection());
-
+app.listen(PORT, () => createDatabaseConnection())
