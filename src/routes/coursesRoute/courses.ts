@@ -6,6 +6,7 @@ import { isAuth } from '../../middlewares/authMiddleware/middleware'
 import express from 'express'
 const CoursesRouter: Router = express.Router()
 import multer from 'multer'
+import { getVideoByID } from '../../controllers/courses/getVideoByID'
 // import path from 'path'
 
 const storage = multer.memoryStorage()
@@ -16,7 +17,8 @@ CoursesRouter.route('/add/course').post(
     isAuth,
     uploadVideo.single('file'),
     addCourses
-)
-CoursesRouter.route('/courses/:module').get(isAuth, getCoursesByUserId)
+);
+CoursesRouter.route('/courses/:module').get(isAuth, getCoursesByUserId);
+CoursesRouter.route('/course/:id').get(isAuth,getVideoByID);
 
 module.exports = CoursesRouter

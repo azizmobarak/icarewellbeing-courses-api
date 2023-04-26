@@ -145,7 +145,7 @@ export const uploadToS3 = async (
 
         await client
             .send(new AWS.CompleteMultipartUploadCommand(s3ParamsComplete))
-            .then((result) => {
+            .then((_result) => {
                 const course = { ...data, video: params.Key }
                 addCourse(course, res)
             })
