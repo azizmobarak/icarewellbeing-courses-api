@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 export type Modules = {
     name: string
-    added_by: string
+    added_by: string[]
 }
 
 const userSchema = new mongoose.Schema<Modules>({
@@ -12,10 +12,12 @@ const userSchema = new mongoose.Schema<Modules>({
         min: 4,
         required: true,
     },
-    added_by: {
-        type: String,
-        required: true,
-    },
+    added_by: [
+        {
+            type: String,
+            required: true,
+        },
+    ],
 })
 
 export const ModuleModel = mongoose.model<Modules>('Module', userSchema)

@@ -1,12 +1,10 @@
 export function getAddedByOrID(decodedToken: string): string {
     const role = getRole(decodedToken)
-    console.log(decodedToken)
     switch (role) {
         case '2':
-            return decodedToken.split(',')[2]
+            return getAddedByID(decodedToken)
         default:
-            console.log('current token but id', decodedToken.split(',')[0])
-            return decodedToken.split(',')[0]
+            return getUserID(decodedToken)
     }
 }
 

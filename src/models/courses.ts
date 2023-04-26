@@ -5,7 +5,7 @@ export type Courses = {
     user_id: string
     name: string
     description: string
-    module: any
+    module: string
     author: string
 }
 

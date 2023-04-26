@@ -1,15 +1,14 @@
 import { Request, Response } from 'express'
-import { ModuleModel } from '../../models/modules'
+import { ModuleModel, Modules } from '../../models/modules'
 import { getAddedByOrID, getRole } from '../../utils/userUtils'
-import sanitize from 'mongo-sanitize'
 import { createResponse } from '../../utils/resultStatus'
 import { decodeToken } from '../../services/parseToken'
 
-export function getModules(req: Request, res: Response) {
+export async function getModules(req: Request, res: Response) {
     const token = req.cookies.access_token
-    const role = getRole(token)
-    getParsedToken(token, res).then((parsedToken) => {
+    await getParsedToken(token, res).then((parsedToken) => {
         if (parsedToken) {
+            const role = getRole(parsedToken)
             const id = getAddedByOrID(parsedToken)
             return getDataAndSendRequest(role, id, res)
         } else {
@@ -22,24 +21,23 @@ export function getModules(req: Request, res: Response) {
     })
 }
 
-const findByID = async (role: string, id: string) => {
-    switch (role) {
-        case '0':
-            return {}
-        default:
-            return { added_by: id }
-    }
+const findByID = (id: string, module: Modules) => {
+    return module.added_by.indexOf(id) !== -1
 }
 
 const getModulesList = async (role: string, id: string) => {
     const module = new ModuleModel()
     const modules: any[] = []
 
-    await module.collection
-        .find(sanitize(findByID(role, id)))
-        .forEach((module) => {
+    await module.collection.find().forEach((module) => {
+        if (role === '0') {
             modules.push(module)
-        })
+        } else {
+            if (findByID(id, module as any)) {
+                modules.push(module)
+            }
+        }
+    })
     return modules
 }
 

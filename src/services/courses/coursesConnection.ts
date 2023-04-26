@@ -2,10 +2,10 @@
 import { Response } from 'express'
 import { Courses, CoursesModel } from '../../models/courses'
 import { ErrorCodeStatus, responseErrorHandler } from '../../utils/ErrorHandler'
-import {
-    Pagination,
-    getPaginationByPageNumber,
-} from '../../utils/calculatePagination'
+// import {
+//     Pagination,
+//     getPaginationByPageNumber,
+// } from '../../utils/calculatePagination'
 import { createResponse } from '../../utils/resultStatus'
 import { fetchDataFromS3 } from '../awsS3service'
 const sanitize = require('mongo-sanitize')
@@ -14,7 +14,6 @@ export function addCourse(data: Courses, res: Response) {
     try {
         const courses = new CoursesModel(sanitize(data))
         courses.save()
-        console.log('video added to database')
         createResponse(
             202,
             {
@@ -31,25 +30,26 @@ export function addCourse(data: Courses, res: Response) {
     }
 }
 
-export async function getCourses(res: Response, id: string, page?: number) {
+export async function getCourses(res: Response, id: string, module: string) {
     try {
         const courses = new CoursesModel()
-        let pagination: Pagination = {} as Pagination
+        // let pagination: Pagination = {} as Pagination
         courses.collection
             .countDocuments({ user_id: sanitize(id) })
             .then((doc: any) => {
                 if (doc === 0) {
                     createResponse(200, [], res)
                 } else {
-                    pagination = getPaginationByPageNumber(doc, 50, 100, page)
+                    // pagination = getPaginationByPageNumber(doc, 50, 100, page)
                     getCoursesCollections(
+                        module,
                         id,
-                        pagination.skip,
-                        pagination.limit,
-                        res,
-                        pagination.totalPages,
-                        pagination.currentPage,
-                        pagination.nextPage
+                        // pagination.skip,
+                        // pagination.limit,
+                        res
+                        // pagination.totalPages,
+                        // pagination.currentPage,
+                        // pagination.nextPage
                     )
                 }
             })
@@ -70,26 +70,27 @@ export async function getCourses(res: Response, id: string, page?: number) {
 }
 
 const getCoursesCollections = async (
+    module: string,
     id: string,
-    _skip: number,
-    _limit: number,
-    res: Response,
-    totalPages: number,
-    currentPage: number,
-    nextPage: number
+    // _skip: number,
+    // _limit: number,
+    res: Response
+    // totalPages: number,
+    // currentPage: number,
+    // nextPage: number
 ) => {
-    getCoursesData(id)
+    getCoursesData(id, module)
         .then(async (data) => {
-            if (data) {
+            if (data && data.length > 0) {
                 await fetchDataFromS3(
                     res,
-                    data,
-                    totalPages,
-                    currentPage,
-                    nextPage
+                    data
+                    // totalPages,
+                    // currentPage,
+                    // nextPage
                 )
             } else {
-                createResponse(200, 'No Data', res)
+                createResponse(200, [], res)
             }
         })
         .catch((_err: string) => {
@@ -97,11 +98,14 @@ const getCoursesCollections = async (
         })
 }
 
-async function getCoursesData(id: string): Promise<any[] | null> {
+async function getCoursesData(
+    id: string,
+    module: string
+): Promise<any[] | null> {
     const courses = new CoursesModel()
     const data: any[] = []
     await courses.collection
-        .find(sanitize({ user_id: id }))
+        .find(sanitize({ user_id: id, module }))
         .forEach((value) => {
             data.push(value)
         })

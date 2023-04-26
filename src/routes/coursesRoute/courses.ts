@@ -17,6 +17,6 @@ CoursesRouter.route('/add/course').post(
     uploadVideo.single('file'),
     addCourses
 )
-CoursesRouter.route('/courses/:page').get(isAuth, getCoursesByUserId)
+CoursesRouter.route('/courses/:module').get(isAuth, getCoursesByUserId)
 
 module.exports = CoursesRouter

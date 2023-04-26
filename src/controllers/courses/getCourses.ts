@@ -5,14 +5,14 @@ import { getCourses } from '../../services/courses/coursesConnection'
 import { getAddedByOrID } from '../../utils/userUtils'
 
 type RequestParams = {
-    params: { page: string }
+    params: { module: string }
 } & Request
 
 export const getCoursesByUserId = (req: RequestParams, res: Response) => {
     return decodeToken(req.cookies.access_token, res)
         .then((data: string) => {
             const id = getRoleAndID(data).id
-            getCourses(res, id, parseInt(req.params.page))
+            getCourses(res, id, req.params.module)
         })
         .catch((_err: any) => {
             createResponse(403, 'Session expired please login', res)

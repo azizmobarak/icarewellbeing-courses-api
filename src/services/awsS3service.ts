@@ -15,42 +15,45 @@ const s3Config = {
     },
 }
 
-
 const client = new AWS.S3(s3Config)
 
 const imageName = crypt.randomBytes(20).toString('hex')
 
-
-
-async function initiateMultipartUpload(key: string,bucket: string) {
+async function initiateMultipartUpload(key: string, bucket: string) {
     try {
-      return await client.send(new AWS.CreateMultipartUploadCommand({Key: key, Bucket: bucket}))
+        return await client.send(
+            new AWS.CreateMultipartUploadCommand({ Key: key, Bucket: bucket })
+        )
     } catch (err) {
-        console.log(err);
-        return err;
+        console.log(err)
+        return err
         // error handler function here
     }
 }
 
-async function uploadPart(body: any, UploadId: string, partNumber: number, data: any, originalName: string) {
+async function uploadPart(
+    body: any,
+    UploadId: string,
+    partNumber: number,
+    data: Courses,
+    originalName: string
+) {
     const partParams = {
         Bucket: process.env.BUCKET_NAME || '',
         Body: body,
         Key: imageName + data.user_id + originalName.replace(' ', ''),
         UploadId: UploadId,
-        PartNumber: partNumber
+        PartNumber: partNumber,
     }
-    console.log('part uploaded');
     return new Promise(async (resolve, reject) => {
         try {
             let part = await client.send(new AWS.UploadPartCommand(partParams))
-            resolve({ PartNumber: partNumber, ETag: part.ETag });
+            resolve({ PartNumber: partNumber, ETag: part.ETag })
         } catch (error) {
-            reject({ partNumber, error });
+            reject({ partNumber, error })
         }
     })
 }
-
 
 export const uploadToS3 = async (
     data: Courses,
@@ -60,7 +63,6 @@ export const uploadToS3 = async (
     size: any,
     res: Response
 ) => {
-    
     try {
         const params = {
             Bucket: process.env.BUCKET_NAME || '',
@@ -69,45 +71,67 @@ export const uploadToS3 = async (
             ContentType: mimeType,
         }
 
-        const fileSize = size; // total size of file
-        const chunkSize = (1024 * 1024) * 5 // 5MB defined as each parts size 
+        const fileSize = size // total size of file
+        const chunkSize = 1024 * 1024 * 5 // 5MB defined as each parts size
         const numParts = Math.ceil(fileSize / chunkSize)
-        const promise = [] // array to hold each async upload call 
+        const promise = [] // array to hold each async upload call
         const slicedData = [] // array to contain our sliced data
         let Parts: any[] = [] //  to hold all Promise.allSettled resolve and reject response
-        let MP_UPLOAD_ID = null // contain the upload ID to use for all processes 
+        let MP_UPLOAD_ID = null // contain the upload ID to use for all processes
         let FailedUploads: any = [] // array to populate failed upload
         let CompletedParts = []
         let RetryPromise = []
 
-
-         MP_UPLOAD_ID = await initiateMultipartUpload(params.Key,params.Bucket).then((result: any)=>{
-             return result["UploadId"];
-        });
+        MP_UPLOAD_ID = await initiateMultipartUpload(
+            params.Key,
+            params.Bucket
+        ).then((result: any) => {
+            return result['UploadId']
+        })
 
         for (let index = 1; index <= numParts; index++) {
             let start = (index - 1) * chunkSize
-            let end = index * chunkSize;
+            let end = index * chunkSize
 
-            promise.push(uploadPart((index < numParts) ? buffer.slice(start, end) : buffer.slice(start), MP_UPLOAD_ID, index, data,originalName))
+            promise.push(
+                uploadPart(
+                    index < numParts
+                        ? buffer.slice(start, end)
+                        : buffer.slice(start),
+                    MP_UPLOAD_ID,
+                    index,
+                    data,
+                    originalName
+                )
+            )
 
-            slicedData.push({ PartNumber: index, buffer: Buffer.from(buffer.slice(start, end + 1)) });
+            slicedData.push({
+                PartNumber: index,
+                buffer: Buffer.from(buffer.slice(start, end + 1)),
+            })
         }
 
-        console.log('start upload all');
 
-        Parts = await Promise.allSettled(promise);
-        FailedUploads = Parts.filter(f => f.status == "rejected");
+        Parts = await Promise.allSettled(promise)
+        FailedUploads = Parts.filter((f) => f.status == 'rejected')
 
         if (!FailedUploads.length) {
             for (let i = 0; i < FailedUploads.length; i++) {
-                let [data_res] = slicedData.filter(f => f.PartNumber == FailedUploads[i].value.PartNumber)
-                let s = await uploadPart(data_res.buffer, MP_UPLOAD_ID, data_res.PartNumber, data,originalName);
-                RetryPromise.push(s);
+                let [data_res] = slicedData.filter(
+                    (f) => f.PartNumber == FailedUploads[i].value.PartNumber
+                )
+                let s = await uploadPart(
+                    data_res.buffer,
+                    MP_UPLOAD_ID,
+                    data_res.PartNumber,
+                    data,
+                    originalName
+                )
+                RetryPromise.push(s)
             }
         }
 
-        CompletedParts = Parts.map(m => m.value);
+        CompletedParts = Parts.map((m) => m.value)
         CompletedParts.push(...RetryPromise)
 
         const s3ParamsComplete = {
@@ -115,43 +139,16 @@ export const uploadToS3 = async (
             Bucket: params.Bucket,
             UploadId: MP_UPLOAD_ID,
             MultipartUpload: {
-                Parts: CompletedParts
-            }
+                Parts: CompletedParts,
+            },
         }
 
-        await client.send(new AWS.CompleteMultipartUploadCommand(s3ParamsComplete)).then(result=>{
-                console.log(result)
+        await client
+            .send(new AWS.CompleteMultipartUploadCommand(s3ParamsComplete))
+            .then((result) => {
                 const course = { ...data, video: params.Key }
                 addCourse(course, res)
-        })
-
-
-        // await client.send(new AWS.PutObjectCommand(params));
-        // const uploadToS3 = new Upload({
-        //     client,
-        //     queueSize: 4,
-        //     partSize: 5242880,
-        //     leavePartsOnError: false,
-        //     params: params,
-        // })
-
-        // const form = new IncomingForm({ multiples: true });
-
-        // form.parse(async function (_err: any, _fields: any, files: any) {
-        //     // const fileStream = fs.createReadStream(files.payload.filepath)
-        // }
-
-        // await uploadToS3
-        //     .done()
-        //     .then((result: any) => {
-        //         console.log(result)
-        //         const course = { ...data, video: params.Key }
-        //         addCourse(course, res)
-        //     })
-        //     .catch((err) => {
-        //         console.log('video s3 error', err)
-        //         createResponse(500, 'cannot upload video please try later', res)
-        //     })
+            })
     } catch (e) {
         console.log(e)
     }
@@ -187,22 +184,18 @@ export const uploadToS3 = async (
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function fetchDataFromS3(
     res: Response,
-    data: Courses[],
-    totalPages: number,
-    currentPage: number,
-    nextPage: number
+    data: Courses[]
+    // totalPages: number,
+    // currentPage: number,
+    // nextPage: number
 ) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return Promise.all([fillData(data)])
         .then((result) => {
-            createResponse(
-                200,
-                { data: result, totalPages, currentPage, nextPage },
-                res
-            )
+            createResponse(200, { data: result }, res)
         })
         .catch(() => {
-            createResponse(404, 'No data Found', res)
+            createResponse(200, [], res)
         })
 }
 
@@ -230,3 +223,31 @@ const preparedVideos = (data: Courses, url: string) => {
         id: data.user_id,
     }
 }
+
+// an other way  to store videos as chunks
+// await client.send(new AWS.PutObjectCommand(params));
+// const uploadToS3 = new Upload({
+//     client,
+//     queueSize: 4,
+//     partSize: 5242880,
+//     leavePartsOnError: false,
+//     params: params,
+// })
+
+// const form = new IncomingForm({ multiples: true });
+
+// form.parse(async function (_err: any, _fields: any, files: any) {
+//     // const fileStream = fs.createReadStream(files.payload.filepath)
+// }
+
+// await uploadToS3
+//     .done()
+//     .then((result: any) => {
+//         console.log(result)
+//         const course = { ...data, video: params.Key }
+//         addCourse(course, res)
+//     })
+//     .catch((err) => {
+//         console.log('video s3 error', err)
+//         createResponse(500, 'cannot upload video please try later', res)
+//     })
