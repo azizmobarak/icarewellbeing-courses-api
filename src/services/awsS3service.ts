@@ -111,7 +111,6 @@ export const uploadToS3 = async (
             })
         }
 
-
         Parts = await Promise.allSettled(promise)
         FailedUploads = Parts.filter((f) => f.status == 'rejected')
 
@@ -212,7 +211,7 @@ const fillData = async (data: Courses[]) => {
         await responseData.push(preparedVideos(data[index], url))
         index++
     } while (index < data.length)
-    console.log(responseData);
+    console.log(responseData)
     return responseData.reverse()
 }
 

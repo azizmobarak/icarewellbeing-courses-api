@@ -49,7 +49,7 @@ const courseSchema = new mongoose.Schema<Courses>({
         type: Number,
         max: 3,
         default: 0,
-    }
+    },
 })
 
 export const CoursesModel = mongoose.model<Courses>('course', courseSchema)

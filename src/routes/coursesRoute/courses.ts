@@ -18,9 +18,9 @@ CoursesRouter.route('/add/course').post(
     isAuth,
     uploadVideo.single('file'),
     addCourses
-);
-CoursesRouter.route('/courses/:module').get(isAuth, getCoursesByUserId);
-CoursesRouter.route('/course/:id').get(isAuth, getVideoByID);
-CoursesRouter.route('/update/course/:id').put(isAuth, updateCourseDetails);
+)
+CoursesRouter.route('/courses/:module').get(isAuth, getCoursesByUserId)
+CoursesRouter.route('/course/:id').get(isAuth, getVideoByID)
+CoursesRouter.route('/update/course/:id').put(isAuth, updateCourseDetails)
 
 module.exports = CoursesRouter
