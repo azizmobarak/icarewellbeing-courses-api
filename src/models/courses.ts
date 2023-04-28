@@ -47,7 +47,7 @@ const courseSchema = new mongoose.Schema<Courses>({
     },
     videoNumber: {
         type: Number,
-        max: 3,
+        max: 500,
         default: 0,
     },
 })
