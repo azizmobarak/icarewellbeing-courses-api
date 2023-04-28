@@ -7,6 +7,7 @@ export type Courses = {
     description: string
     module: string
     author: string
+    videoNumber?: number
 }
 
 // author missed
@@ -32,7 +33,7 @@ const courseSchema = new mongoose.Schema<Courses>({
     description: {
         type: String,
         required: true,
-        max: 250,
+        max: 1000,
     },
     module: {
         type: String,
@@ -44,6 +45,11 @@ const courseSchema = new mongoose.Schema<Courses>({
         require,
         max: 200,
     },
+    videoNumber: {
+        type: Number,
+        max: 3,
+        default: 0,
+    }
 })
 
 export const CoursesModel = mongoose.model<Courses>('course', courseSchema)

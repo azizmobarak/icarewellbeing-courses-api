@@ -192,7 +192,7 @@ export async function fetchDataFromS3(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return Promise.all([fillData(data)])
         .then((result) => {
-            createResponse(200, { data: result }, res)
+            createResponse(200, result, res)
         })
         .catch(() => {
             createResponse(200, [], res)
@@ -212,15 +212,19 @@ const fillData = async (data: Courses[]) => {
         await responseData.push(preparedVideos(data[index], url))
         index++
     } while (index < data.length)
+    console.log(responseData);
     return responseData.reverse()
 }
 
-const preparedVideos = (data: Courses, url: string) => {
+const preparedVideos = (data: any, url: string) => {
     return {
+        _id: data._id,
         title: data.name,
         description: data.description,
         url: url,
         id: data.user_id,
+        videoNumber: data.videoNumber,
+        author: data.author,
     }
 }
 
