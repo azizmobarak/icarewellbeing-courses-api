@@ -5,6 +5,8 @@ import { uploadToS3 } from '../../services/awsS3service'
 import { ModuleModel } from '../../models/modules'
 import sanitize from 'mongo-sanitize'
 import { getUserID } from '../../utils/userUtils'
+import { UserModel } from '../../models/users'
+import { CoursesModel } from '../../models/courses'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ObjectId = require('mongodb').ObjectId
 
@@ -13,9 +15,9 @@ const ObjectId = require('mongodb').ObjectId
 //     files: {filename: string}[];
 // }
 
-export const addCourses = (req: any, res: Response) => {
+export const addCourses = async (req: any, res: Response) => {
     let module_id = ''
-    decodeToken(req.cookies.access_token, res)
+    await decodeToken(req.cookies.access_token, res)
         .then(async (result: string) => {
             if (result) {
                 const id = getUserID(result)
@@ -30,27 +32,59 @@ export const addCourses = (req: any, res: Response) => {
                         } else {
                             module_id = moduleId
                         }
+                        await getAuthor(id)
+                            .then(async (author) => {
+                                if (!author) {
+                                    return createResponse(
+                                        403,
+                                        'not a User',
+                                        res
+                                    )
+                                } else {
+                                    await countVideosByModule(module_id).then(
+                                        (videoNumber) => {
+                                            if (videoNumber !== -1) {
+                                                const data = {
+                                                    user_id: id,
+                                                    video: req.file.filename,
+                                                    name: req.body.name,
+                                                    description:
+                                                        req.body.description,
+                                                    module: module_id,
+                                                    author: author,
+                                                    videoNumber,
+                                                }
 
-                        const data = {
-                            user_id: id,
-                            video: req.file.filename,
-                            name: req.body.name,
-                            description: req.body.description,
-                            module: module_id,
-                            author: req.body.author,
-                        }
-
-                        return uploadToS3(
-                            data,
-                            req.body.name,
-                            req.file.buffer,
-                            req.file.mimetype,
-                            req.file.size,
-                            res
-                        )
+                                                return uploadToS3(
+                                                    data,
+                                                    req.body.name,
+                                                    req.file.buffer,
+                                                    req.file.mimetype,
+                                                    req.file.size,
+                                                    res
+                                                )
+                                            } else {
+                                                return createResponse(
+                                                    403,
+                                                    'cannot get video number',
+                                                    res
+                                                )
+                                            }
+                                        }
+                                    )
+                                }
+                            })
+                            .catch((err) => {
+                                console.log(err)
+                                return createResponse(
+                                    403,
+                                    'cannot add Module please try again',
+                                    res
+                                )
+                            })
                     })
-                    .catch((e) => {
-                        console.log(e)
+                    .catch((err) => {
+                        console.log(err)
                         return createResponse(
                             403,
                             'cannot add Module please try again',
@@ -141,4 +175,33 @@ const findModuleAndUpdateAdded_By_List = (id: string, added_by: string[]) => {
         { _id: sanitize(new ObjectId(id)) },
         { $set: { added_by: [...added_by, id] } }
     )
+}
+
+const getAuthor = async (user_id: string): Promise<null | string> => {
+    const users = new UserModel()
+    return await users.collection
+        .findOne({ _id: sanitize(new ObjectId(user_id)) })
+        .then((doc: any) => {
+            if (doc) {
+                return doc.username
+            }
+            return null
+        })
+        .catch((err) => {
+            console.log(err)
+            return null
+        })
+}
+
+const countVideosByModule = async (module_id: string): Promise<number> => {
+    const course = new CoursesModel()
+    return await course.collection
+        .countDocuments({ module: sanitize(module_id) })
+        .then((count) => {
+            return count + 1
+        })
+        .catch((err) => {
+            console.log(err)
+            return -1
+        })
 }

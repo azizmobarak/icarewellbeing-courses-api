@@ -77,10 +77,10 @@ export function authorizeUser(
                   path: '/',
               }
             : {
-                httpOnly: false,
-                secure: true,
-                sameSite: 'none',
-                domain: process.env.DOMAINE,
+                  httpOnly: false,
+                  secure: true,
+                  sameSite: 'none',
+                  domain: process.env.DOMAINE,
               }
 
     const token = signUserAuth(id, role, added_by, email)
