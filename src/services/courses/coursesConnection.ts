@@ -8,6 +8,7 @@ import { ErrorCodeStatus, responseErrorHandler } from '../../utils/ErrorHandler'
 // } from '../../utils/calculatePagination'
 import { createResponse } from '../../utils/resultStatus'
 import { fetchDataFromS3 } from '../awsS3service'
+import { ObjectId } from 'mongodb'
 const sanitize = require('mongo-sanitize')
 
 export function addCourse(data: Courses, res: Response) {
@@ -144,3 +145,20 @@ async function getCoursesData(
 //         createResponse(200, { data, totalPages, currentPage, nextPage }, res)
 //     }
 // }
+
+export async function findAndUpdateCourse(
+    id: string,
+    data: Courses,
+    res: Response
+) {
+    try {
+        const course = new CoursesModel()
+        await course.collection.findOneAndUpdate(
+            { _id: new ObjectId(sanitize(id)) },
+            { $set: { ...data } }
+        )
+        createResponse(200, 'updated with success', res)
+    } catch {
+        createResponse(405, 'not updated', res)
+    }
+}

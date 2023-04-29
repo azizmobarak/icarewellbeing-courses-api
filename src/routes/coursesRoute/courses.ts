@@ -26,6 +26,10 @@ CoursesRouter.route('/add/course').post(
 )
 CoursesRouter.route('/courses/:module').get(isAuth, getCoursesByUserId)
 CoursesRouter.route('/course/:id').get(isAuth, getVideoByID)
-CoursesRouter.route('/update/course/:id').put(isAuth, updateCourseDetails)
+CoursesRouter.route('/update/course/:id').put(
+    isAuth,
+    uploadVideo.fields(fields),
+    updateCourseDetails
+)
 
 module.exports = CoursesRouter

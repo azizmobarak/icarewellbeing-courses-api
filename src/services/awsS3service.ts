@@ -3,7 +3,7 @@ import * as AWS from '@aws-sdk/client-s3'
 import crypt from 'crypto'
 import { Courses } from '../models/courses'
 import { Response } from 'express'
-import { addCourse } from './courses/coursesConnection'
+import { addCourse, findAndUpdateCourse } from './courses/coursesConnection'
 import { createResponse } from '../utils/resultStatus'
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner')
 
@@ -56,15 +56,17 @@ async function uploadPart(
 }
 
 export const uploadToS3 = async (
-    data: Courses,
+    data: Courses | any,
     originalName: string,
     buffer: Buffer,
     thumbnailBuffer: Buffer,
     mimeType: string,
     thumbnailMimeType: string,
     size: number,
-    res: Response
+    res: Response,
+    course_id?: string
 ) => {
+    console.log('1', data)
     try {
         const params = {
             Bucket: process.env.BUCKET_NAME || '',
@@ -160,8 +162,14 @@ export const uploadToS3 = async (
                                 thumbnail: result,
                                 video: params.Key,
                             }
-                            addCourse(course, res)
+                            console.log('inside to upadate', course_id)
+                            if (course_id) {
+                                findAndUpdateCourse(course_id, course, res)
+                            } else {
+                                addCourse(course, res)
+                            }
                         } else {
+                            console.log('cannot')
                             createResponse(
                                 500,
                                 'cannot upload thumbnail please try or contact support',
@@ -179,12 +187,12 @@ export const uploadToS3 = async (
                     })
             })
     } catch (e) {
+        console.log('2', e)
         createResponse(
             500,
             'cannot upload thumbnail please try or contact support',
             res
         )
-        console.log('2', e)
     }
 }
 
