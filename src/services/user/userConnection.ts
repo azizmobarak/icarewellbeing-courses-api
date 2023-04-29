@@ -37,7 +37,7 @@ export function verifyUserAuth(token: string, res: Response) {
 
 export function checkUserExistAndAuth(res: Response, data: Users): void {
     const userModel = new UserModel()
-    const email = data.email.toLocaleLowerCase();
+    const email = data.email.toLocaleLowerCase()
     userModel.collection
         .findOne(sanitize({ email }))
         .then((doc: HydratedDocument<any>) => {
@@ -52,7 +52,7 @@ export function checkUserExistAndAuth(res: Response, data: Users): void {
             }
         })
         .catch((err) => {
-            console.log(err);
+            console.log(err)
             return createResponse(
                 203,
                 `oops something happen Sorry, back again later`,
@@ -142,7 +142,13 @@ async function addUser(
 ) {
     const userModel = new UserModel()
     userModel.collection
-        .insertOne(sanitize({ ...data, email: data.email.toLocaleLowerCase(), password: hash }))
+        .insertOne(
+            sanitize({
+                ...data,
+                email: data.email.toLocaleLowerCase(),
+                password: hash,
+            })
+        )
         .then(async (doc) => {
             // await sendPasswordEmail(data.email, password)
             createResponse(

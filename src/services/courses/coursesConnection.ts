@@ -30,12 +30,28 @@ export function addCourse(data: Courses, res: Response) {
     }
 }
 
-export async function getCourses(res: Response, id: string, module: string) {
+export const getCoursesQuery = (id: string, role: string) => {
+    switch (role) {
+        case '0':
+            return {}
+        default:
+            return {
+                user_id: sanitize(id),
+            }
+    }
+}
+
+export async function getCourses(
+    res: Response,
+    id: string,
+    role: string,
+    module: string
+) {
     try {
         const courses = new CoursesModel()
         // let pagination: Pagination = {} as Pagination
         courses.collection
-            .countDocuments({ user_id: sanitize(id) })
+            .countDocuments(getCoursesQuery(id, role))
             .then((doc: any) => {
                 if (doc === 0) {
                     createResponse(200, [], res)
@@ -44,6 +60,7 @@ export async function getCourses(res: Response, id: string, module: string) {
                     getCoursesCollections(
                         module,
                         id,
+                        role,
                         // pagination.skip,
                         // pagination.limit,
                         res
@@ -72,6 +89,7 @@ export async function getCourses(res: Response, id: string, module: string) {
 const getCoursesCollections = async (
     module: string,
     id: string,
+    role: string,
     // _skip: number,
     // _limit: number,
     res: Response
@@ -79,7 +97,7 @@ const getCoursesCollections = async (
     // currentPage: number,
     // nextPage: number
 ) => {
-    getCoursesData(id, module)
+    await getCoursesData(id, role, module)
         .then(async (data) => {
             if (data && data.length > 0) {
                 await fetchDataFromS3(
@@ -100,12 +118,13 @@ const getCoursesCollections = async (
 
 async function getCoursesData(
     id: string,
+    role: string,
     module: string
 ): Promise<any[] | null> {
     const courses = new CoursesModel()
     const data: any[] = []
     await courses.collection
-        .find(sanitize({ user_id: id, module }))
+        .find(sanitize({ ...getCoursesQuery(id, role), module }))
         .forEach((value) => {
             data.push(value)
         })

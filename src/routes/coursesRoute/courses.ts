@@ -14,9 +14,14 @@ const storage = multer.memoryStorage()
 
 export const uploadVideo = multer({ storage })
 
+const fields = [
+    { name: 'file', maxCount: 1 },
+    { name: 'thumbnail', maxCount: 1 },
+]
+
 CoursesRouter.route('/add/course').post(
     isAuth,
-    uploadVideo.single('file'),
+    uploadVideo.fields(fields),
     addCourses
 )
 CoursesRouter.route('/courses/:module').get(isAuth, getCoursesByUserId)
