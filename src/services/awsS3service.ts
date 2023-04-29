@@ -3,7 +3,7 @@ import * as AWS from '@aws-sdk/client-s3'
 import crypt from 'crypto'
 import { Courses } from '../models/courses'
 import { Response } from 'express'
-import { addCourse } from './courses/coursesConnection'
+import { addCourse, findAndUpdateCourse } from './courses/coursesConnection'
 import { createResponse } from '../utils/resultStatus'
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner')
 
@@ -56,13 +56,17 @@ async function uploadPart(
 }
 
 export const uploadToS3 = async (
-    data: Courses,
+    data: Courses | any,
     originalName: string,
     buffer: Buffer,
+    thumbnailBuffer: Buffer,
     mimeType: string,
-    size: any,
-    res: Response
+    thumbnailMimeType: string,
+    size: number,
+    res: Response,
+    course_id?: string
 ) => {
+    console.log('1', data)
     try {
         const params = {
             Bucket: process.env.BUCKET_NAME || '',
@@ -144,41 +148,78 @@ export const uploadToS3 = async (
 
         await client
             .send(new AWS.CompleteMultipartUploadCommand(s3ParamsComplete))
-            .then((_result) => {
-                const course = { ...data, video: params.Key }
-                addCourse(course, res)
+            .then(async (_result) => {
+                await uploadThumbnailFileToS3(
+                    data.thumbnail,
+                    thumbnailBuffer,
+                    thumbnailMimeType,
+                    data.user_id
+                )
+                    .then((result) => {
+                        if (result) {
+                            const course = {
+                                ...data,
+                                thumbnail: result,
+                                video: params.Key,
+                            }
+                            console.log('inside to upadate', course_id)
+                            if (course_id) {
+                                findAndUpdateCourse(course_id, course, res)
+                            } else {
+                                addCourse(course, res)
+                            }
+                        } else {
+                            console.log('cannot')
+                            createResponse(
+                                500,
+                                'cannot upload thumbnail please try or contact support',
+                                res
+                            )
+                        }
+                    })
+                    .catch((err) => {
+                        console.log('1', err)
+                        createResponse(
+                            500,
+                            'cannot upload thumbnail please try or contact support',
+                            res
+                        )
+                    })
             })
     } catch (e) {
-        console.log(e)
+        console.log('2', e)
+        createResponse(
+            500,
+            'cannot upload thumbnail please try or contact support',
+            res
+        )
     }
 }
 
 // for images upload use this function
-// export async function uploadFileToS3(
-//     data: Courses,
-//     originalName: string,
-//     buffer: Buffer,
-//     mimeType: string,
-//     res: Response
-// ) {
-//     const params = {
-//         Bucket: process.env.BUCKET_NAME || '',
-//         Key: imageName + data.user_id + originalName,
-//         Body: buffer,
-//         ContentType: mimeType,
-//     }
-//     const command = new AWS.CreateMultipartUploadCommand(params)
-//     await client
-//         .send(command)
-//         .then((result) => {
-//             console.log('video uploaded to s3', result)
-//             const course = { ...data, video: params.Key }
-//             addCourse(course, res)
-//         })
-//         .catch((err) => {
-//             console.log('video s3 error', err)
-//         })
-// }
+export async function uploadThumbnailFileToS3(
+    originalName: string,
+    buffer: Buffer,
+    mimeType: string,
+    user_id: string
+): Promise<null | string> {
+    const params = {
+        Bucket: process.env.BUCKET_NAME || '',
+        Key: imageName + user_id + originalName.replace(' ', ''),
+        Body: buffer,
+        ContentType: mimeType,
+    }
+    const command = new AWS.PutObjectCommand(params)
+    return await client
+        .send(command)
+        .then((_result) => {
+            return params.Key
+        })
+        .catch((err) => {
+            console.log(err)
+            return null
+        })
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function fetchDataFromS3(
@@ -202,26 +243,45 @@ const fillData = async (data: Courses[]) => {
     const responseData: any[] = []
     let index = 0
     do {
-        const getObjectParams = {
+        const getVideoParams = {
             Bucket: process.env.BUCKET_NAME || '',
             Key: data[index].video,
         }
-        const command = new AWS.GetObjectCommand(getObjectParams)
-        const url = await getSignedUrl(client, command, { expiresIn: 3600 })
-        await responseData.push(preparedVideos(data[index], url))
+        const getThumbnailParams = {
+            Bucket: process.env.BUCKET_NAME || '',
+            Key: data[index].thumbnail,
+        }
+        // get Video
+        const videoCommand = new AWS.GetObjectCommand(getVideoParams)
+        const url = await getSignedUrl(client, videoCommand, {
+            expiresIn: 3600,
+        })
+
+        // get Thumbnail
+        let thumbnail = ''
+        if (data[index].thumbnail) {
+            const thumbnailCommand = new AWS.GetObjectCommand(
+                getThumbnailParams
+            )
+            thumbnail = await getSignedUrl(client, thumbnailCommand, {
+                expiresIn: 3600,
+            })
+        }
+
+        await responseData.push(preparedVideos(data[index], url, thumbnail))
         index++
     } while (index < data.length)
-    console.log(responseData)
     return responseData.reverse()
 }
 
-const preparedVideos = (data: any, url: string) => {
+const preparedVideos = (data: any, url: string, thumbnail: string) => {
     return {
         _id: data._id,
+        id: data.user_id,
         title: data.name,
         description: data.description,
-        url: url,
-        id: data.user_id,
+        url,
+        thumbnail,
         videoNumber: data.videoNumber,
         author: data.author,
     }

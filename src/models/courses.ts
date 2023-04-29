@@ -8,6 +8,7 @@ export type Courses = {
     module: string
     author: string
     videoNumber?: number
+    thumbnail: string
 }
 
 // author missed
@@ -49,6 +50,10 @@ const courseSchema = new mongoose.Schema<Courses>({
         type: Number,
         max: 500,
         default: 0,
+    },
+    thumbnail: {
+        type: String,
+        max: 1000,
     },
 })
 

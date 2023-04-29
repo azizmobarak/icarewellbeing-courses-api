@@ -11,8 +11,8 @@ type RequestParams = {
 export const getCoursesByUserId = (req: RequestParams, res: Response) => {
     return decodeToken(req.cookies.access_token, res)
         .then((data: string) => {
-            const id = getRoleAndID(data).id
-            getCourses(res, id, req.params.module)
+            const user = getRoleAndID(data)
+            getCourses(res, user.id, user.role, req.params.module)
         })
         .catch((_err: any) => {
             createResponse(403, 'Session expired please login', res)

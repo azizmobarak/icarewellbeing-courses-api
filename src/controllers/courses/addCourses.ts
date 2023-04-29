@@ -15,6 +15,8 @@ const ObjectId = require('mongodb').ObjectId
 //     files: {filename: string}[];
 // }
 
+// TODO change file to videoFile as thumbnail to thumbnailFile from beackend and front end
+
 export const addCourses = async (req: any, res: Response) => {
     let module_id = ''
     await decodeToken(req.cookies.access_token, res)
@@ -46,7 +48,11 @@ export const addCourses = async (req: any, res: Response) => {
                                             if (videoNumber !== -1) {
                                                 const data = {
                                                     user_id: id,
-                                                    video: req.file.filename,
+                                                    video: req.files.file[0]
+                                                        .originalname,
+                                                    thumbnail:
+                                                        req.files.thumbnail[0]
+                                                            .originalname,
                                                     name: req.body.name,
                                                     description:
                                                         req.body.description,
@@ -58,9 +64,13 @@ export const addCourses = async (req: any, res: Response) => {
                                                 return uploadToS3(
                                                     data,
                                                     req.body.name,
-                                                    req.file.buffer,
-                                                    req.file.mimetype,
-                                                    req.file.size,
+                                                    req.files.file[0].buffer,
+                                                    req.files.thumbnail[0]
+                                                        .buffer,
+                                                    req.files.file[0].mimetype,
+                                                    req.files.thumbnail[0]
+                                                        .mimetype,
+                                                    req.files.file[0].size,
                                                     res
                                                 )
                                             } else {
