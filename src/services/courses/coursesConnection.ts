@@ -148,7 +148,7 @@ async function getCoursesData(
 
 export async function findAndUpdateCourse(
     id: string,
-    data: Courses,
+    data: any,
     res: Response
 ) {
     try {
@@ -158,7 +158,8 @@ export async function findAndUpdateCourse(
             { $set: { ...data } }
         )
         createResponse(200, 'updated with success', res)
-    } catch {
+    } catch(err) {
+        console.log(err)
         createResponse(405, 'not updated', res)
     }
 }

@@ -5,6 +5,7 @@ import sanitize from 'mongo-sanitize'
 import { ObjectId } from 'mongodb'
 
 export const updateCourseDetails = (req: Request, res: Response) => {
+     console.log(req.files)
     const id = req.params.id
     const data = req.body
     return addNewFilesToS3(req.files, data, res, id)
@@ -16,8 +17,9 @@ async function addNewFilesToS3(
     res: Response,
     id: string
 ) {
-    const thumbnail = files.thumbnail[0]
-    const video = files.file[0]
+    const emptyName = {originalname:''}
+    const thumbnail = files.thumbnail ? files.thumbnail[0] : emptyName
+    const video = files.file ? files.file[0]  : emptyName
     const course = new CoursesModel()
     course.collection
         .findOne({ _id: sanitize(new ObjectId(id)) })
