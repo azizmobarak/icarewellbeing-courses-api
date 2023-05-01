@@ -9,6 +9,7 @@ import { HydratedDocument } from 'mongoose'
 const ObjectId = require('mongodb').ObjectId
 import sanitize from 'mongo-sanitize'
 import bcrypt from 'bcrypt'
+import crypt from 'crypto'
 // import { sendPasswordEmail } from '../emailService'
 const saltRounds = 10
 
@@ -141,12 +142,14 @@ async function addUser(
     // password: string
 ) {
     const userModel = new UserModel()
-    userModel.collection
+    const token = crypt.randomBytes(34).toString('hex')
+    await userModel.collection
         .insertOne(
             sanitize({
                 ...data,
                 email: data.email.toLocaleLowerCase(),
                 password: hash,
+                token,
             })
         )
         .then(async (doc) => {
