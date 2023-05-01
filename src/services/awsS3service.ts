@@ -66,7 +66,6 @@ export const uploadToS3 = async (
     res: Response,
     course_id?: string
 ) => {
-
     try {
         const params = {
             Bucket: process.env.BUCKET_NAME || '',
@@ -76,10 +75,17 @@ export const uploadToS3 = async (
         }
 
         // when video is not sent
-         if(!data.video){
-             console.log('no video')
-          return  await uploadTumbnailOrUpdateDataWithThumbnail(data,thumbnailBuffer,thumbnailMimeType,'',res,course_id);
-          }
+        if (!data.video) {
+            console.log('no video')
+            return await uploadTumbnailOrUpdateDataWithThumbnail(
+                data,
+                thumbnailBuffer,
+                thumbnailMimeType,
+                '',
+                res,
+                course_id
+            )
+        }
 
         const fileSize = size // total size of file
         const chunkSize = 1024 * 1024 * 5 // 5MB defined as each parts size
@@ -152,28 +158,33 @@ export const uploadToS3 = async (
             },
         }
 
-         if(!data.thumbnail && course_id){
-           return  await client
-            .send(new AWS.CompleteMultipartUploadCommand(s3ParamsComplete))
-            .then(async (result) => {
-                if (result) {
-                            const course = {
-                                 user_id: data.user_id,
-                                 name: data.name,
-                                 description: data.description,
-                                 video: params.Key,
-                            }
-                             findAndUpdateCourse(course_id, course, res)
+        if (!data.thumbnail && course_id) {
+            return await client
+                .send(new AWS.CompleteMultipartUploadCommand(s3ParamsComplete))
+                .then(async (result) => {
+                    if (result) {
+                        const course = {
+                            user_id: data.user_id,
+                            name: data.name,
+                            description: data.description,
+                            video: params.Key,
                         }
-            })
-
-          }
-       
+                        findAndUpdateCourse(course_id, course, res)
+                    }
+                })
+        }
 
         await client
             .send(new AWS.CompleteMultipartUploadCommand(s3ParamsComplete))
             .then(async (_result) => {
-                await uploadTumbnailOrUpdateDataWithThumbnail(data,thumbnailBuffer,thumbnailMimeType,params,res,course_id);
+                await uploadTumbnailOrUpdateDataWithThumbnail(
+                    data,
+                    thumbnailBuffer,
+                    thumbnailMimeType,
+                    params,
+                    res,
+                    course_id
+                )
             })
     } catch (e) {
         console.log('2', e)
@@ -185,55 +196,64 @@ export const uploadToS3 = async (
     }
 }
 
-const uploadTumbnailOrUpdateDataWithThumbnail = async(data: any,thumbnailBuffer: Buffer,thumbnailMimeType: string, params: any, res: Response,course_id?: string) => {
-    console.log('thumb update data', data.thumbnail,
-                    thumbnailBuffer,
-                    thumbnailMimeType,
-                    data.user_id)
-     await uploadThumbnailFileToS3(
-                    data.thumbnail,
-                    thumbnailBuffer,
-                    thumbnailMimeType,
-                    data.user_id
-                )
-                    .then((result) => {
-                        if (result) {
-                            if(!params.Key && course_id){
-                                const course = {
-                                user_id: data.user_id,
-                                name: data.name,
-                                description: data.description,
-                                thumbnail: result,
-                            }
-                              findAndUpdateCourse(course_id, course, res)
-                            }else {
-                                
-                            if (course_id) {
-                                const course = {
-                                ...data,
-                                thumbnail: result,
-                                video: params.Key,
-                                }
-                                findAndUpdateCourse(course_id, course, res)
-                            } else {
-                                const course: Courses = {
-                                ...data,
-                                thumbnail: result,
-                                video: params.Key,
-                            }
-                                addCourse(course, res)
-                            }
-                            
+const uploadTumbnailOrUpdateDataWithThumbnail = async (
+    data: any,
+    thumbnailBuffer: Buffer,
+    thumbnailMimeType: string,
+    params: any,
+    res: Response,
+    course_id?: string
+) => {
+    console.log(
+        'thumb update data',
+        data.thumbnail,
+        thumbnailBuffer,
+        thumbnailMimeType,
+        data.user_id
+    )
+    await uploadThumbnailFileToS3(
+        data.thumbnail,
+        thumbnailBuffer,
+        thumbnailMimeType,
+        data.user_id
+    )
+        .then((result) => {
+            if (result) {
+                if (!params.Key && course_id) {
+                    const course = {
+                        user_id: data.user_id,
+                        name: data.name,
+                        description: data.description,
+                        thumbnail: result,
+                    }
+                    findAndUpdateCourse(course_id, course, res)
+                } else {
+                    if (course_id) {
+                        const course = {
+                            ...data,
+                            thumbnail: result,
+                            video: params.Key,
                         }
-                    }})
-                    .catch((err) => {
-                        console.log('1', err)
-                        createResponse(
-                            500,
-                            'cannot upload thumbnail please try or contact support',
-                            res
-                        )
-                    })
+                        findAndUpdateCourse(course_id, course, res)
+                    } else {
+                        const course: Courses = {
+                            ...data,
+                            thumbnail: result,
+                            video: params.Key,
+                        }
+                        addCourse(course, res)
+                    }
+                }
+            }
+        })
+        .catch((err) => {
+            console.log('1', err)
+            createResponse(
+                500,
+                'cannot upload thumbnail please try or contact support',
+                res
+            )
+        })
 }
 
 // for images upload use this function

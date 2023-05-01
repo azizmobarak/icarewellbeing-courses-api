@@ -9,7 +9,7 @@ export const checkPasswordEncError = (
 ): void | RequestHandler => {
     const passwordHash = encryptPassword(req.body.password)
     if (!passwordHash) {
-        createResponse(400, 'password error', res)
+        return createResponse(400, 'password error', res)
     }
     return next()
 }

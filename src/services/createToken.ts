@@ -49,3 +49,13 @@ export const fakeUserTokenSign = (res: Response) => {
         status: 200,
     })
 }
+
+export async function createRandonToken() {
+    return await require('crypto').randomBytes(
+        48,
+        async function (_err: any, buffer: Buffer) {
+            console.log('token created', buffer.toString('hex'))
+            return await buffer.toString('hex')
+        }
+    )
+}

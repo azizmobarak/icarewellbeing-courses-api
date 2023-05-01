@@ -158,7 +158,7 @@ export async function findAndUpdateCourse(
             { $set: { ...data } }
         )
         createResponse(200, 'updated with success', res)
-    } catch(err) {
+    } catch (err) {
         console.log(err)
         createResponse(405, 'not updated', res)
     }
