@@ -16,6 +16,7 @@ import {
     isSuperAdmin,
 } from '../../middlewares/authMiddleware/middleware'
 import { getUsers } from '../../controllers/users/getUsers'
+import { updateUser } from '../../controllers/users/updateUser'
 
 router.route('/register').post(validateUser, addNewUser)
 // Put accepts password and token
@@ -25,5 +26,6 @@ router
     .post(validateRequestRestPassword, requestresetPassword)
 router.route('/user/delete').delete(isAuth, isSuperAdmin, deleteUser)
 router.route('/users/list').get(isAuth,getUsers)
+router.route('users/update').put(isAuth,updateUser);
 
 module.exports = router
