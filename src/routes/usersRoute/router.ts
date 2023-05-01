@@ -13,9 +13,9 @@ import { requestresetPassword } from '../../controllers/users/requestResetPasswo
 
 router.route('/register').post(validateUser, addNewUser)
 // Put accepts password and token
-router.route('/resetPassword').put(validateResetPassword, resetPassword)
+router.route('/password/reset').put(validateResetPassword, resetPassword)
 router
-    .route('/requestPassword')
+    .route('/password/request')
     .post(validateRequestRestPassword, requestresetPassword)
 
 module.exports = router

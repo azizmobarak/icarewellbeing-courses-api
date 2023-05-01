@@ -19,7 +19,7 @@ export async function resetPassword(req: Request, res: Response) {
                     if (value) {
                         createResponse(200, 'password has been changed', res)
                     } else {
-                        createResponse(402, 'please try again', res)
+                        createResponse(403, 'please try again', res)
                     }
                 })
             }
@@ -36,7 +36,7 @@ const upadatePassword = async (
     return await user.collection
         .findOneAndUpdate({ token: token }, { $set: { password, token: hash } })
         .then((doc) => {
-            if (doc) {
+            if (doc.value) {
                 return true
             } else {
                 return false
