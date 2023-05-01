@@ -10,6 +10,12 @@ import {
 } from '../../middlewares/userMiddlwares/validationMiddlwares'
 import { resetPassword } from '../../controllers/users/resetPassword'
 import { requestresetPassword } from '../../controllers/users/requestResetPassword'
+import { deleteUser } from '../../controllers/users/deleteUser'
+import {
+    isAuth,
+    isSuperAdmin,
+} from '../../middlewares/authMiddleware/middleware'
+import { getUsers } from '../../controllers/users/getUsers'
 
 router.route('/register').post(validateUser, addNewUser)
 // Put accepts password and token
@@ -17,5 +23,7 @@ router.route('/password/reset').put(validateResetPassword, resetPassword)
 router
     .route('/password/request')
     .post(validateRequestRestPassword, requestresetPassword)
+router.route('/user/delete').delete(isAuth, isSuperAdmin, deleteUser)
+router.route('/users/list').get(isAuth,getUsers)
 
 module.exports = router
