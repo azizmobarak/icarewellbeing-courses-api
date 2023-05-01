@@ -24,6 +24,6 @@ router
     .route('/password/request')
     .post(validateRequestRestPassword, requestresetPassword)
 router.route('/user/delete').delete(isAuth, isSuperAdmin, deleteUser)
-router.route('/users/list').get(getUsers)
+router.route('/users/list').get(isAuth,getUsers)
 
 module.exports = router
