@@ -17,6 +17,7 @@ import {
 } from '../../middlewares/authMiddleware/middleware'
 import { getUsers } from '../../controllers/users/getUsers'
 import { updateUser } from '../../controllers/users/updateUser'
+import { getUserData } from '../../controllers/users/getUserData'
 
 router.route('/register').post(validateUser, addNewUser)
 // Put accepts password and token
@@ -26,6 +27,7 @@ router
     .post(validateRequestRestPassword, requestresetPassword)
 router.route('/user/status').put(isAuth, isSuperAdmin, changeUserStatus)
 router.route('/users/list/:page').get(isAuth, getUsers)
-router.route('users/update').put(isAuth, updateUser)
+router.route('/users/update').put(isAuth, updateUser)
+router.route('/user/:id').get(isAuth, getUserData)
 
 module.exports = router

@@ -28,19 +28,18 @@ class EmailServiceImpl implements EmailService {
         const subject = 'Welcome To Billivance E-Learning'
         const message = `HI 👋 ,your account has been created 🔥, your password is ${password} \n and your login is ${this.email}`
         try {
-
-           let transporter = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
-            port: parseInt(process.env.HOST || '22'),
-            secure: false, // true for 465, false for other ports
-            auth: {
-                user: process.env.EMAIL, // generated ethereal user
-                pass: process.env.EMAIL_PASSWORD, // generated ethereal password
-            },
-            tls: {
-                rejectUnauthorized: false,
-            },
-        })
+            let transporter = nodemailer.createTransport({
+                host: process.env.EMAIL_HOST,
+                port: parseInt(process.env.HOST || '22'),
+                secure: false, // true for 465, false for other ports
+                auth: {
+                    user: process.env.EMAIL, // generated ethereal user
+                    pass: process.env.EMAIL_PASSWORD, // generated ethereal password
+                },
+                tls: {
+                    rejectUnauthorized: false,
+                },
+            })
             // send mail with defined transport object
             const info = await transporter.sendMail({
                 from: process.env.EMAIL, // sender address
@@ -64,17 +63,17 @@ class EmailServiceImpl implements EmailService {
         const message = `HI 👋 ,you requested to reset password, click on the link bellow to reset your password https://courses.billivance.com/resetPassword/${token}`
         try {
             let transporter = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
-            port: parseInt(process.env.HOST || '22'),
-            secure: false, // true for 465, false for other ports
-            auth: {
-                user: process.env.EMAIL, // generated ethereal user
-                pass: process.env.EMAIL_PASSWORD, // generated ethereal password
-            },
-            tls: {
-                rejectUnauthorized: false,
-            },
-         })
+                host: process.env.EMAIL_HOST,
+                port: parseInt(process.env.HOST || '22'),
+                secure: false, // true for 465, false for other ports
+                auth: {
+                    user: process.env.EMAIL, // generated ethereal user
+                    pass: process.env.EMAIL_PASSWORD, // generated ethereal password
+                },
+                tls: {
+                    rejectUnauthorized: false,
+                },
+            })
             // send mail with defined transport object
             const info = await transporter.sendMail({
                 from: process.env.EMAIL, // sender address

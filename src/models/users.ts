@@ -41,10 +41,10 @@ const userSchema = new mongoose.Schema<Users>(
             type: String,
             max: 1000,
         },
-        active:{
+        active: {
             type: Boolean,
             default: true,
-        }
+        },
     },
     { timestamps: true }
 )
