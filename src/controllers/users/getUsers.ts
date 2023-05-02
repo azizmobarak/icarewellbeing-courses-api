@@ -12,7 +12,7 @@ export async function getUsers(req: Request, res: Response) {
             if (value) {
                 const id = getUserID(value)
                 const role = getRole(value)
-                const email = getUserEmail(value);
+                const email = getUserEmail(value)
                 switch (role) {
                     case '0':
                         {
@@ -78,8 +78,12 @@ const getUsersById = async (page: number, id?: string): Promise<any> => {
     })
 }
 
-const getAllUsers = async (page: number,email:string, id?: string): Promise<any> => {
-    const users = new UserModel();
+const getAllUsers = async (
+    page: number,
+    email: string,
+    id?: string
+): Promise<any> => {
+    const users = new UserModel()
     let usersCollection: any[] = []
     return await pagination(page, id).then(async (value) => {
         if (value) {
@@ -88,14 +92,15 @@ const getAllUsers = async (page: number,email:string, id?: string): Promise<any>
                 .skip(value.skip)
                 .limit(100)
                 .forEach((doc) => {
-                    if(email !== doc.email){
-                      usersCollection.push({
-                        email: doc.email,
-                        id: doc._id,
-                        username: doc.username,
-                        role: doc.role,
-                        status: doc.active ?? true ? 'Active' : 'Not active',
-                    })
+                    if (email !== doc.email) {
+                        usersCollection.push({
+                            email: doc.email,
+                            id: doc._id,
+                            username: doc.username,
+                            role: doc.role,
+                            status:
+                                doc.active ?? true ? 'Active' : 'Not active',
+                        })
                     }
                 })
             return {

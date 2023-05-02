@@ -14,6 +14,7 @@ export function getUserData(req: Request, res: Response) {
                     email: result.email,
                     role: result.role,
                     username: result.username,
+                    restrictedModules: result.restrictedModules ?? [],
                 }
                 createResponse(200, data, res)
             } else {

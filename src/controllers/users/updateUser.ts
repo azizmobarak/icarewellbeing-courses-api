@@ -8,41 +8,41 @@ export function updateUser(req: Request, res: Response) {
     const id = req.body.id
     const user = req.body
     const data = prepareUserUpdateData(user)
-    if(!user.password){
-        return updateUserData(data,id).then(result=>{
-            if (result) {
-                         createResponse(200, 'updated', res)
-                        } else {
-                            createResponse(200, 'Not updated', res)
-                        }
-                    })
-                    .catch(() => {
-                        createResponse(400, 'Not updated', res)
-                    })
-    }else{
-        return getPasswordAndUpdate(user,id,res);
+    if (!user.password) {
+        return updateUserData(data, id)
+            .then((result) => {
+                if (result) {
+                    createResponse(200, 'updated', res)
+                } else {
+                    createResponse(200, 'Not updated', res)
+                }
+            })
+            .catch(() => {
+                createResponse(400, 'Not updated', res)
+            })
+    } else {
+        return getPasswordAndUpdate(user, id, res)
     }
 }
 
 const prepareUserUpdateData = (user: any) => {
-    const data = user;
-   if(!user.password){
-       delete data.password;
-   }
-   if(!user.email){
-       delete data.email;
-   }
+    const data = user
+    if (!user.password) {
+        delete data.password
+    }
+    if (!user.email) {
+        delete data.email
+    }
 
-   if(!user.role){
-       delete data.role
-   }
+    if (!user.role) {
+        delete data.role
+    }
 
-   if(!user.username){
-       delete data.username;
-   }
+    if (!user.username) {
+        delete data.username
+    }
 
-   return data;
-
+    return data
 }
 
 const getPasswordAndUpdate = async (user: Users, id: string, res: Response) => {
@@ -77,7 +77,7 @@ const updateUserData = async (user: Users, id: string) => {
         .updateOne(
             { id: id },
             {
-                $set: {...user},
+                $set: { ...user },
             }
         )
         .then((doc) => {
