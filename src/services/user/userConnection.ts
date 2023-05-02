@@ -77,7 +77,8 @@ export function authorizeUser(
                   httpOnly: true,
                   expires: dayjs().add(30, "days").toDate(),
                   secure: true,
-                //   sameSite: 'strict',
+                  sameSite: 'strict',
+                  domain: process.env.DOMAINE,
                 //   //   maxAge: 60 * 60 * 24 * 30,
                 //   path: '/',
               }
