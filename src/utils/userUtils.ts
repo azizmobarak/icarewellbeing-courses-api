@@ -19,3 +19,7 @@ export function getAddedByID(decodedToken: string): string {
 export function getUserID(decodedToken: string): string {
     return decodedToken.split(',')[0]
 }
+
+export function getUserEmail(decodedToken: string): string {
+    return decodedToken.split(',')[3]
+}

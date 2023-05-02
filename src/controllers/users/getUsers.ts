@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { UserModel } from '../../models/users'
 import sanitize from 'mongo-sanitize'
 import { decodeToken } from '../../services/parseToken'
-import { getRole, getUserID } from '../../utils/userUtils'
+import { getRole, getUserEmail, getUserID } from '../../utils/userUtils'
 import { ObjectId } from 'mongodb'
 
 export async function getUsers(req: Request, res: Response) {
@@ -12,10 +12,11 @@ export async function getUsers(req: Request, res: Response) {
             if (value) {
                 const id = getUserID(value)
                 const role = getRole(value)
+                const email = getUserEmail(value);
                 switch (role) {
                     case '0':
                         {
-                            const data = await getAllUsers(page)
+                            const data = await getAllUsers(page, email)
                             res.status(200).send({
                                 list: data,
                             })
@@ -77,8 +78,8 @@ const getUsersById = async (page: number, id?: string): Promise<any> => {
     })
 }
 
-const getAllUsers = async (page: number, id?: string): Promise<any> => {
-    const users = new UserModel()
+const getAllUsers = async (page: number,email:string, id?: string): Promise<any> => {
+    const users = new UserModel();
     let usersCollection: any[] = []
     return await pagination(page, id).then(async (value) => {
         if (value) {
@@ -87,13 +88,15 @@ const getAllUsers = async (page: number, id?: string): Promise<any> => {
                 .skip(value.skip)
                 .limit(100)
                 .forEach((doc) => {
-                    usersCollection.push({
+                    if(email !== doc.email){
+                      usersCollection.push({
                         email: doc.email,
                         id: doc._id,
                         username: doc.username,
                         role: doc.role,
                         status: doc.active ?? true ? 'Active' : 'Not active',
                     })
+                    }
                 })
             return {
                 data: usersCollection,
