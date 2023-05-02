@@ -7,6 +7,7 @@ export type Users = {
     role: string
     added_by: string
     token: string
+    active: boolean
 }
 
 const userSchema = new mongoose.Schema<Users>(
@@ -40,6 +41,10 @@ const userSchema = new mongoose.Schema<Users>(
             type: String,
             max: 1000,
         },
+        active:{
+            type: Boolean,
+            default: true,
+        }
     },
     { timestamps: true }
 )

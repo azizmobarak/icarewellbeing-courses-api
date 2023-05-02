@@ -3,18 +3,19 @@ import { UserModel } from '../../models/users'
 import sanitize from 'mongo-sanitize'
 import { decodeToken } from '../../services/parseToken'
 import { getRole, getUserID } from '../../utils/userUtils'
+import { ObjectId } from 'mongodb'
 
 export async function getUsers(req: Request, res: Response) {
+    const page = parseInt(req.params.page);
     await decodeToken(req.cookies.access_token, res)
         .then(async (value) => {
-            console.log(value)
             if (value) {
                 const id = getUserID(value)
                 const role = getRole(value)
                 switch (role) {
                     case '0':
                         {
-                            const data = await getAllUsers()
+                            const data = await getAllUsers(page)
                             res.status(200).send({
                                 list: data,
                             })
@@ -22,7 +23,7 @@ export async function getUsers(req: Request, res: Response) {
                         break
                     case '1':
                         {
-                            const data = await getUsersById(id)
+                            const data = await getUsersById(page,id)
                             res.status(200).send({
                                 list: data,
                             })
@@ -45,10 +46,12 @@ export async function getUsers(req: Request, res: Response) {
         })
 }
 
-const getUsersById = async (id: string): Promise<any[]> => {
+const getUsersById = async (page: number,id?: string): Promise<any> => {
     const users = new UserModel()
     let usersCollection: any[] = []
-    await users.collection.find({ added_by: sanitize(id) }).forEach((doc) => {
+   return await pagination(page,id).then(async value=>{
+    if(value){
+  await users.collection.find({ added_by: sanitize(id) }).skip(value.skip).limit(value.limit).forEach((doc) => {
         usersCollection.push({
             email: doc.email,
             id: doc._id,
@@ -56,21 +59,90 @@ const getUsersById = async (id: string): Promise<any[]> => {
             role: doc.role,
         })
     })
-    console.log(usersCollection)
-    return usersCollection
+    return {
+        data: usersCollection,
+        nextPage:value.next,
+        totalPages:value.totalPages,
+        currentPage: page,
+    }
+    }else {
+        return {
+            data: [],
+        };
+    }
+})
 }
 
-const getAllUsers = async (): Promise<any[]> => {
+const getAllUsers = async (page: number,id?: string): Promise<any> => {
     const users = new UserModel()
     let usersCollection: any[] = []
-    await users.collection.find({}).forEach((doc) => {
+return await pagination(page,id).then(async value=>{
+    if(value){
+  await users.collection.find({}).skip(value.skip).limit(value.limit).forEach((doc) => {
         usersCollection.push({
             email: doc.email,
             id: doc._id,
             username: doc.username,
             role: doc.role,
+            status: (doc.active ?? true) ? 'Active' : 'Not active',
         })
     })
-    console.log(usersCollection)
-    return usersCollection
+    return {
+        data: usersCollection,
+        nextPage:value.next,
+        totalPages:value.totalPages,
+        currentPage: page,
+    }
+    }else {
+        return {
+            data: [],
+        };
+    }
+})
+    
+}
+
+
+const pagination = async(page: number,id?: string): Promise<any> => {
+ return await getTotalUsers(id).then(total => {
+    if(total === - 1)
+    {
+       return null;
+    }else {
+const limit  = 10;
+const skip = page * 10;
+const totalPages = Math.floor(total / limit);
+const next = page + 1 < totalPages ? page + 1 : page;
+ return {
+     limit,
+     next,
+     skip,
+     total,
+     totalPages,
+ }
+    }
+  })
+}
+
+const getTotalUsers = async(id?: string): Promise<number> => {
+ const users = new UserModel();
+ if(id){
+  return await users.collection.countDocuments({_id: sanitize(new ObjectId(id))})
+     .then(count=>{
+         console.log('count docs',count);
+         return count;
+     }).catch(err=>{
+         console.log(err);
+         return -1;
+     })
+ }else {
+     return await users.collection.countDocuments({})
+     .then(count=>{
+          console.log('count docs',count);
+         return count;
+     }).catch(err=>{
+         console.log(err);
+         return -1;
+     })
+ }
 }
