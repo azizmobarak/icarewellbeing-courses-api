@@ -8,6 +8,7 @@ export type Users = {
     added_by: string
     token: string
     active: boolean
+    restrictedModules: string[]
 }
 
 const userSchema = new mongoose.Schema<Users>(
@@ -45,6 +46,12 @@ const userSchema = new mongoose.Schema<Users>(
             type: Boolean,
             default: true,
         },
+        restrictedModules: [
+            {
+                type: String,
+                max: 1000,
+            },
+        ],
     },
     { timestamps: true }
 )

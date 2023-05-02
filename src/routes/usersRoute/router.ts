@@ -18,6 +18,7 @@ import {
 import { getUsers } from '../../controllers/users/getUsers'
 import { updateUser } from '../../controllers/users/updateUser'
 import { getUserData } from '../../controllers/users/getUserData'
+import { restrictModule } from '../../controllers/users/restrictModule'
 
 router.route('/register').post(validateUser, addNewUser)
 // Put accepts password and token
@@ -29,5 +30,6 @@ router.route('/user/status').put(isAuth, isSuperAdmin, changeUserStatus)
 router.route('/users/list/:page').get(isAuth, getUsers)
 router.route('/users/update').put(isAuth, updateUser)
 router.route('/user/:id').get(isAuth, getUserData)
+router.route('/user/restrict-module').put(isAuth, restrictModule)
 
 module.exports = router

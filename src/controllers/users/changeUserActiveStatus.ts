@@ -21,7 +21,7 @@ export async function changeUserStatus(req: Request, res: Response) {
                             const status = !value.active
                                 ? 'Active'
                                 : 'Not Active'
-                                console.log(status);
+                            console.log(status)
                             createResponse(200, 'user now is ' + status, res)
                         } else {
                             createResponse(204, [], res)
