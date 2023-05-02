@@ -5,7 +5,7 @@ import { signUserAuth } from '../createToken'
 import { decodeToken } from '../parseToken'
 import { CookieOptions, Response } from 'express'
 import { HydratedDocument } from 'mongoose'
-import dayjs from 'dayjs';
+import dayjs from 'dayjs'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ObjectId = require('mongodb').ObjectId
 import sanitize from 'mongo-sanitize'
@@ -75,25 +75,25 @@ export function authorizeUser(
         process.env.NODE_DEV === 'PRO'
             ? {
                   httpOnly: true,
-                  expires: dayjs().add(30, "days").toDate(),
+                  expires: dayjs().add(30, 'days').toDate(),
                   secure: true,
                   sameSite: 'strict',
                   domain: process.env.DOMAINE,
-                //   //   maxAge: 60 * 60 * 24 * 30,
-                //   path: '/',
+                  //   //   maxAge: 60 * 60 * 24 * 30,
+                  //   path: '/',
               }
             : {
-                //   httpOnly: true,
-                //   secure: true,
-                //   sameSite: 'none',
-                //   domain: process.env.DOMAINE,
+                  //   httpOnly: true,
+                  //   secure: true,
+                  //   sameSite: 'none',
+                  //   domain: process.env.DOMAINE,
                   httpOnly: true,
                   secure: false,
-                //   sameSite: 'none',
-                    // maxAge:
-                 expires: dayjs().add(30, "days").toDate(),
-                //   path: '/',
-                //   domain: process.env.DOMAINE,
+                  //   sameSite: 'none',
+                  // maxAge:
+                  expires: dayjs().add(30, 'days').toDate(),
+                  //   path: '/',
+                  //   domain: process.env.DOMAINE,
               }
 
     const token = signUserAuth(id, role, added_by, email)
