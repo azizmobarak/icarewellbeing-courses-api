@@ -4,17 +4,20 @@ import { ObjectId } from 'mongodb'
 import sanitize from 'mongo-sanitize'
 import { createResponse } from '../../utils/resultStatus'
 
-export function deleteUser(req: Request, res: Response) {
+export async function changeUserStatus(req: Request, res: Response) {
     const user = new UserModel()
-    user.collection
-        .deleteOne({ _id: sanitize(new ObjectId(req.body.id)) })
+   await user.collection.findOne({_id: sanitize(new ObjectId(req.body.id))}).then(value=>{
+       if(value){
+     user.collection
+        .updateOne({ _id: sanitize(new ObjectId(req.body.id)) },{'$set':{active: !value.active}})
         .then((doc) => {
             if (doc) {
-                createResponse(203, 'user deleted', res)
+                const status = !value.active ? 'Active' : 'Not Active'
+                createResponse(200, 'user now is ' + status, res)
             } else {
                 createResponse(
-                    203,
-                    'user not found, try different email address',
+                    204,
+                    [],
                     res
                 )
             }
@@ -27,4 +30,6 @@ export function deleteUser(req: Request, res: Response) {
                 res
             )
         })
+       }
+   })
 }

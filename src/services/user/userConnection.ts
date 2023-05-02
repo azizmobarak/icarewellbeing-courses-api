@@ -5,6 +5,7 @@ import { signUserAuth } from '../createToken'
 import { decodeToken } from '../parseToken'
 import { CookieOptions, Response } from 'express'
 import { HydratedDocument } from 'mongoose'
+import dayjs from 'dayjs';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ObjectId = require('mongodb').ObjectId
 import sanitize from 'mongo-sanitize'
@@ -71,19 +72,27 @@ export function authorizeUser(
     res: Response
 ) {
     const cookieConfig: CookieOptions =
-        process.env.NODE_DEV !== 'PRO'
+        process.env.NODE_DEV === 'PRO'
             ? {
                   httpOnly: true,
+                  expires: dayjs().add(30, "days").toDate(),
                   secure: true,
-                  sameSite: 'strict',
-                  //   maxAge: 60 * 60 * 24 * 30,
-                  path: '/',
+                //   sameSite: 'strict',
+                //   //   maxAge: 60 * 60 * 24 * 30,
+                //   path: '/',
               }
             : {
-                  httpOnly: false,
-                  secure: true,
-                  sameSite: 'none',
-                  domain: process.env.DOMAINE,
+                //   httpOnly: true,
+                //   secure: true,
+                //   sameSite: 'none',
+                //   domain: process.env.DOMAINE,
+                  httpOnly: true,
+                  secure: false,
+                //   sameSite: 'none',
+                    // maxAge:
+                 expires: dayjs().add(30, "days").toDate(),
+                //   path: '/',
+                //   domain: process.env.DOMAINE,
               }
 
     const token = signUserAuth(id, role, added_by, email)

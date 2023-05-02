@@ -5,9 +5,11 @@ import { senResetPasswordEmail } from '../../services/emailService'
 
 export function requestresetPassword(req: Request, res: Response) {
     const user = new UserModel()
+    console.log(req.body.email);
     user.collection
         .findOne({ email: req.body.email })
         .then((result) => {
+            console.log(result)
             if (result) {
                 senResetPasswordEmail(result.email, result.token)
                 createResponse(

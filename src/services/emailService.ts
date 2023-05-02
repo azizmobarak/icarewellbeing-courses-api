@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer'
-import SMTPTransport from 'nodemailer/lib/smtp-transport'
+// import SMTPTransport from 'nodemailer/lib/smtp-transport'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config()
 
@@ -19,10 +19,17 @@ export const senResetPasswordEmail = (
 
 // email service  to made managing sending emails easy
 class EmailServiceImpl implements EmailService {
-    private transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>
+    // private transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>
     constructor(private readonly email: string) {
         // create reusable transporter object using the default SMTP transport
-        this.transporter = nodemailer.createTransport({
+    }
+
+    async sendPasswordEmail(password: string) {
+        const subject = 'Welcome To Billivance E-Learning'
+        const message = `HI 👋 ,your account has been created 🔥, your password is ${password} \n and your login is ${this.email}`
+        try {
+
+           let transporter = nodemailer.createTransport({
             host: process.env.EMAIL_HOST,
             port: parseInt(process.env.HOST || '22'),
             secure: false, // true for 465, false for other ports
@@ -34,14 +41,8 @@ class EmailServiceImpl implements EmailService {
                 rejectUnauthorized: false,
             },
         })
-    }
-
-    async sendPasswordEmail(password: string) {
-        const subject = 'Welcome To Billivance E-Learning'
-        const message = `HI 👋 ,your account has been created 🔥, your password is ${password} \n and your login is ${this.email}`
-        try {
             // send mail with defined transport object
-            const info = await this.transporter.sendMail({
+            const info = await transporter.sendMail({
                 from: process.env.EMAIL, // sender address
                 cc: this.email,
                 to: this.email, // list of receivers
@@ -58,11 +59,24 @@ class EmailServiceImpl implements EmailService {
     }
 
     async senResetPasswordEmail(token: string) {
+        console.log(token)
         const subject = 'Billivance - reset password'
         const message = `HI 👋 ,you requested to reset password, click on the link bellow to reset your password https://courses.billivance.com/resetPassword/${token}`
         try {
+            let transporter = nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,
+            port: parseInt(process.env.HOST || '22'),
+            secure: false, // true for 465, false for other ports
+            auth: {
+                user: process.env.EMAIL, // generated ethereal user
+                pass: process.env.EMAIL_PASSWORD, // generated ethereal password
+            },
+            tls: {
+                rejectUnauthorized: false,
+            },
+         })
             // send mail with defined transport object
-            const info = await this.transporter.sendMail({
+            const info = await transporter.sendMail({
                 from: process.env.EMAIL, // sender address
                 cc: this.email,
                 to: this.email, // list of receivers
