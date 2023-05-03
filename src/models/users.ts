@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, { SchemaTimestampsConfig } from 'mongoose'
 
 export type Users = {
     email: string
@@ -9,7 +9,7 @@ export type Users = {
     token: string
     active: boolean
     restrictedModules: string[]
-}
+} & SchemaTimestampsConfig
 
 const userSchema = new mongoose.Schema<Users>(
     {
@@ -52,6 +52,14 @@ const userSchema = new mongoose.Schema<Users>(
                 max: 1000,
             },
         ],
+        createdAt: {
+            type: Date,
+            default: Date.now,
+        },
+        updatedAt: {
+            type: Date,
+            default: Date.now,
+        },
     },
     { timestamps: true }
 )

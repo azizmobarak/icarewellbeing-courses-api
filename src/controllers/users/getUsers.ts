@@ -62,6 +62,8 @@ const getUsersById = async (page: number, id?: string): Promise<any> => {
                         id: doc._id,
                         username: doc.username,
                         role: doc.role,
+                        status: doc.active ?? true ? 'Active' : 'Not active',
+                        createdAt: doc.createdAt ?? '',
                     })
                 })
             return {
@@ -100,6 +102,7 @@ const getAllUsers = async (
                             role: doc.role,
                             status:
                                 doc.active ?? true ? 'Active' : 'Not active',
+                            createdAt: doc.createdAt ?? '',
                         })
                     }
                 })

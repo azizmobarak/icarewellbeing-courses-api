@@ -160,6 +160,7 @@ async function addUser(
                 email: data.email.toLocaleLowerCase(),
                 password: hash,
                 token,
+                createdAt: new Date(),
             })
         )
         .then(async (doc) => {

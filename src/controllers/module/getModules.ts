@@ -13,7 +13,7 @@ export async function getModules(req: Request, res: Response) {
         if (parsedToken) {
             const role = getRole(parsedToken)
             const id = getAddedByOrID(parsedToken)
-            const active_user_id = getUserID(parsedToken);
+            const active_user_id = getUserID(parsedToken)
             return getDataAndSendRequest(role, id, active_user_id, res)
         } else {
             return createResponse(
@@ -29,27 +29,44 @@ const findByID = (id: string, module: Modules) => {
     return module.added_by.indexOf(id) !== -1
 }
 
-const getModulesList = async (role: string, id: string, active_user_id: string) => {
+const getModulesList = async (
+    role: string,
+    id: string,
+    active_user_id: string
+) => {
     const module = new ModuleModel()
-    const users  = new UserModel();
+    const users = new UserModel()
     const modules: any[] = []
-await users.collection.findOne({_id: sanitize(new ObjectId(active_user_id))}).then(async doc=>{{
-   await module.collection.find().forEach((module) => {
-        if (role === '0') {
-            modules.push(module)
-        } else {
-            if(!doc?.restrictedModules.includes(module._id.toString())){
-                if (findByID(id, module as any)) {
-                modules.push(module)
+    await users.collection
+        .findOne({ _id: sanitize(new ObjectId(active_user_id)) })
+        .then(async (doc) => {
+            {
+                await module.collection.find().forEach((module) => {
+                    if (role === '0') {
+                        modules.push(module)
+                    } else {
+                        if (
+                            !doc?.restrictedModules.includes(
+                                module._id.toString()
+                            )
+                        ) {
+                            if (findByID(id, module as any)) {
+                                modules.push(module)
+                            }
+                        }
+                    }
+                })
             }
-            }
-        }
-    })
-}})
+        })
     return modules
 }
 
-async function getDataAndSendRequest(role: string, id: string,active_user_id: string, res: Response) {
+async function getDataAndSendRequest(
+    role: string,
+    id: string,
+    active_user_id: string,
+    res: Response
+) {
     return await getModulesList(role, id, active_user_id)
         .then((data) => {
             createResponse(200, data, res)
