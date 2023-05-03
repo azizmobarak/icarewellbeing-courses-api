@@ -12,10 +12,10 @@ export function decodeToken(token: string, res: Response): Promise<string> {
                 if (decoded) {
                     resolve(decoded.data)
                 } else {
-                    createResponse(403, 'Session expired please login', res)
+                    createResponse(401, 'Session expired please login', res)
                 }
             } catch (e) {
-                createResponse(403, 'Session expired please login', res)
+                createResponse(401, 'Session expired please login', res)
                 // reject(new Error('token not found'))
             }
         }

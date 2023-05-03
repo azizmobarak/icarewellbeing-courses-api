@@ -13,7 +13,10 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 
-const domainsFromEnv = process.env.CORS_DOMAINS || '*'
+const domainsFromEnv =
+    (process.env.NODE_ENV === 'PRO'
+        ? process.env.CORS_DOMAINS
+        : process.env.DEV_CORS) || '*'
 
 const whitelist = domainsFromEnv.split(',').map((item) => item.trim())
 

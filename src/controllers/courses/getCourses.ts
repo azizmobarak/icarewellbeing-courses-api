@@ -15,7 +15,7 @@ export const getCoursesByUserId = (req: RequestParams, res: Response) => {
             getCourses(res, user.id, user.role, req.params.module)
         })
         .catch((_err: any) => {
-            createResponse(403, 'Session expired please login', res)
+            createResponse(401, 'Session expired please login', res)
         })
 }
 

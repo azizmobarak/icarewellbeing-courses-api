@@ -146,7 +146,6 @@ const getTotalUsers = async (id?: string): Promise<number> => {
         return await users.collection
             .countDocuments({ _id: sanitize(new ObjectId(id)) })
             .then((count) => {
-                console.log('count docs', count)
                 return count
             })
             .catch((err) => {
@@ -157,7 +156,6 @@ const getTotalUsers = async (id?: string): Promise<number> => {
         return await users.collection
             .countDocuments({})
             .then((count) => {
-                console.log('count docs', count)
                 return count
             })
             .catch((err) => {
