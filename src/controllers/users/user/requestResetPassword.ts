@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
-import { UserModel } from '../../models/users'
-import { createResponse } from '../../utils/resultStatus'
-import { senResetPasswordEmail } from '../../services/emailService'
+import { UserModel } from '../../../models/users'
+import { createResponse } from '../../../utils/resultStatus'
+import { senResetPasswordEmail } from '../../../services/emailService'
 
 export function requestresetPassword(req: Request, res: Response) {
     const user = new UserModel()

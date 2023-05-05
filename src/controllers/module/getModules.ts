@@ -71,8 +71,9 @@ async function getDataAndSendRequest(
         .then((data) => {
             createResponse(200, data, res)
         })
-        .catch(() => {
-            createResponse(200, 'cannot get Modules', res)
+        .catch((err) => {
+            console.log(err)
+            createResponse(203, 'cannot get Modules', res)
         })
 }
 

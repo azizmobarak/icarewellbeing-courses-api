@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
-import { UserModel } from '../../models/users'
+import { UserModel } from '../../../models/users'
 import sanitize from 'mongo-sanitize'
 import { ObjectId } from 'mongodb'
-import { createResponse } from '../../utils/resultStatus'
+import { createResponse } from '../../../utils/resultStatus'
 
 export async function restrictModule(req: Request, res: Response) {
     const { module, id, isChecked } = req.body

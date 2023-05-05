@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
-import { UserModel } from '../../models/users'
+import { UserModel } from '../../../models/users'
 import { ObjectId } from 'mongodb'
 import sanitize from 'mongo-sanitize'
-import { createResponse } from '../../utils/resultStatus'
+import { createResponse } from '../../../utils/resultStatus'
 
 export function getUserData(req: Request, res: Response) {
     const users = new UserModel()

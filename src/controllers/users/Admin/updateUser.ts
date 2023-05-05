@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { UserModel, Users } from '../../models/users'
-import { createResponse } from '../../utils/resultStatus'
+import { UserModel, Users } from '../../../models/users'
+import { createResponse } from '../../../utils/resultStatus'
 import bcrypt from 'bcrypt'
 const saltRounds = 10
 

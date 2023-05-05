@@ -1,8 +1,8 @@
 import { Response, Request } from 'express'
-import { UserModel } from '../../models/users'
+import { UserModel } from '../../../models/users'
 import { ObjectId } from 'mongodb'
 import sanitize from 'mongo-sanitize'
-import { createResponse } from '../../utils/resultStatus'
+import { createResponse } from '../../../utils/resultStatus'
 
 export async function changeUserStatus(req: Request, res: Response) {
     console.log('status', req.body.id)

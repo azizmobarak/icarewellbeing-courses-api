@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
-import { UserModel } from '../../models/users'
+import { UserModel } from '../../../models/users'
 import sanitize from 'mongo-sanitize'
-import { decodeToken } from '../../services/parseToken'
-import { getRole, getUserEmail, getUserID } from '../../utils/userUtils'
+import { decodeToken } from '../../../services/parseToken'
+import { getRole, getUserEmail, getUserID } from '../../../utils/userUtils'
 import { ObjectId } from 'mongodb'
 
 export async function getUsers(req: Request, res: Response) {
@@ -49,7 +49,7 @@ export async function getUsers(req: Request, res: Response) {
 
 const getUsersById = async (page: number, id?: string): Promise<any> => {
     const users = new UserModel()
-    let usersCollection: any[] = []
+    const usersCollection: any[] = []
     return await pagination(page, id).then(async (value) => {
         if (value) {
             await users.collection
@@ -86,7 +86,7 @@ const getAllUsers = async (
     id?: string
 ): Promise<any> => {
     const users = new UserModel()
-    let usersCollection: any[] = []
+    const usersCollection: any[] = []
     return await pagination(page, id).then(async (value) => {
         if (value) {
             await users.collection

@@ -6,10 +6,10 @@ import { HydratedDocument } from 'mongoose'
 const bcrypt = require('bcrypt')
 const saltRounds = 22
 
-export const encryptPassword = (password: string): string | null => {
-    return bcrypt.genSalt(saltRounds, function (err: any, salt: any) {
+export const encryptPassword = async(password: string): Promise<string | null> => {
+    return await bcrypt.genSalt(saltRounds,async function (err: string, salt: any) {
         if (err) return null
-        return bcrypt.hash(password, salt, function (err: any, hash: any) {
+        return await bcrypt.hash(password, salt, function (err: string, hash: string) {
             if (err) return err
             return hash
         })

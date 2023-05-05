@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
-import { UserModel } from '../../models/users'
+import { UserModel } from '../../../models/users'
 import bcrypt from 'bcrypt'
 import crypt from 'crypto'
-import { createResponse } from '../../utils/resultStatus'
+import { createResponse } from '../../../utils/resultStatus'
 const saltRounds = 10
 
 export async function resetPassword(req: Request, res: Response) {
