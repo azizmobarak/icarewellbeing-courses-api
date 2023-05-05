@@ -161,6 +161,7 @@ async function addUser(
                 password: hash,
                 token,
                 createdAt: new Date(),
+                restrictedModules: []
             })
         )
         .then(async (doc) => {
